@@ -88,7 +88,6 @@ button:hover {
 #pulseaudio,
 #custom-bluetooth,
 #custom-vpn,
-#custom-display-toggle,
 #tray,
 #mode,
 #idle_inhibitor {
@@ -249,11 +248,5 @@ label:focus {
 #custom-vpn.disconnected {
     background-color: #374145;
     color: #E67E80;
-}
-
-/* Display toggle styling */
-#custom-display-toggle {
-    background-color: #374145;
-    color: #D3C6AA;
 }
 

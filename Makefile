@@ -272,6 +272,9 @@ install-gui-hyprland: sanity-check ## Install Hyprland compositor (Wayland)
 		ln -sf /opt/skillarch/config/hypr/hyprland.conf ~/.config/hypr/hyprland.conf; \
 	fi
 
+	# Create empty monitors.conf if it doesn't exist (sourced by hyprland.conf for custom multi-monitor setups)
+	touch ~/.config/hypr/monitors.conf
+
 	# hyprpaper config
 	[ -f ~/.config/hypr/hyprpaper.conf ] && [ ! -L ~/.config/hypr/hyprpaper.conf ] && mv ~/.config/hypr/hyprpaper.conf ~/.config/hypr/hyprpaper.conf.skabak
 	ln -sf /opt/skillarch/config/hypr/hyprpaper.conf ~/.config/hypr/hyprpaper.conf

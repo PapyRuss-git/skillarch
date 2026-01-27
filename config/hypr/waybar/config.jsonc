@@ -8,7 +8,7 @@
     // Module layout
     "modules-left": ["hyprland/workspaces"],
     "modules-center": ["clock"],
-    "modules-right": ["pulseaudio", "custom/bluetooth", "custom/vpn", "network", "custom/display-toggle", "backlight", "battery", "tray"],
+    "modules-right": ["pulseaudio", "custom/bluetooth", "custom/vpn", "network", "backlight", "battery", "tray"],
     
     // Workspaces
     "hyprland/workspaces": {
@@ -113,15 +113,5 @@
         "tooltip": true,
         "on-click": "~/.config/waybar/scripts/vpn-toggle.sh",
         "on-click-right": "nm-connection-editor"
-    },
-
-    // Display Toggle
-    "custom/display-toggle": {
-        "format": "{}",
-        "exec": "~/.config/waybar/scripts/display-toggle.sh",
-        "interval": 10,
-        "tooltip": true,
-        "tooltip-format": "Cliquez pour inverser l'ordre des écrans",
-        "on-click": "~/.config/waybar/scripts/display-swap.sh"
     },
 }
