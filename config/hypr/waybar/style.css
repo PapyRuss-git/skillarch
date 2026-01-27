@@ -83,7 +83,7 @@ button:hover {
 
 #clock,
 #battery,
-#backlight,
+#custom-backlight,
 #network,
 #pulseaudio,
 #custom-bluetooth,
@@ -103,7 +103,7 @@ button:hover {
 
 #clock:hover,
 #battery:hover,
-#backlight:hover,
+#custom-backlight:hover,
 #network:hover,
 #pulseaudio:hover,
 #custom-bluetooth:hover,
@@ -181,7 +181,7 @@ label:focus {
 }
 
 
-#backlight {
+#custom-backlight {
     background-color: #374145;
     color: #D3C6AA;
 }
@@ -249,4 +249,5 @@ label:focus {
     background-color: #374145;
     color: #E67E80;
 }
+
 

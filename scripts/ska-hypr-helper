@@ -3,7 +3,7 @@
 # SkillArch Hyprland Helper
 # Outil de gestion rapide pour Hyprland
 
-set -e
+set -euo pipefail
 
 # Colors Everforest
 GREEN='\033[38;2;167;192;128m'

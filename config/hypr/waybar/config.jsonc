@@ -8,7 +8,7 @@
     // Module layout
     "modules-left": ["hyprland/workspaces"],
     "modules-center": ["clock"],
-    "modules-right": ["pulseaudio", "custom/bluetooth", "custom/vpn", "network", "backlight", "battery", "tray"],
+    "modules-right": ["pulseaudio", "custom/bluetooth", "custom/vpn", "network", "custom/backlight", "battery", "tray"],
     
     // Workspaces
     "hyprland/workspaces": {
@@ -45,13 +45,14 @@
     },
     
     // Backlight/Brightness
-    "backlight": {
-        "device": "auto",
-        "format": "{icon} {percent}%",
-        "format-icons": ["🔅", "🔆"],
+    "custom/backlight": {
+        "format": "{}",
+        "exec": "~/.config/waybar/scripts/backlight-status.sh",
+        "interval": 2,
+        "tooltip": true,
+        "on-click": "pkill -x hyprsunset || hyprsunset >/dev/null 2>&1 &",
         "on-scroll-up": "brightnessctl set 5%+",
-        "on-scroll-down": "brightnessctl set 5%-",
-        "smooth-scrolling-threshold": 1
+        "on-scroll-down": "brightnessctl set 5%-"
     },
     
     // Battery
@@ -114,4 +115,5 @@
         "on-click": "~/.config/waybar/scripts/vpn-toggle.sh",
         "on-click-right": "nm-connection-editor"
     },
+
 }

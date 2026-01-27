@@ -18,9 +18,10 @@ sanity-check:
 	@[ "$$(pwd)" != "/opt/skillarch" ] && [ "$$(pwd)" != "/opt/skillarch-original" ] && echo "You must be in /opt/skillarch or /opt/skillarch-original to run this command" && exit 1
 	@sudo id || (echo "Error: sudo access is required" ; exit 1)
 
-# Window Manager Choice Variables
-WM_CHOICE := $(shell cat /tmp/ska-wm-choice.txt 2>/dev/null || echo "")
-HYPR_MODE := $(shell cat /tmp/ska-hypr-mode.txt 2>/dev/null || echo "desktop")
+# Window Manager Choice Variables (persisted in ~/.config/skillarch/)
+SKA_CONFIG_DIR := $(HOME)/.config/skillarch
+WM_CHOICE := $(shell cat $(HOME)/.config/skillarch/wm-choice 2>/dev/null || echo "")
+HYPR_MODE := $(shell cat $(HOME)/.config/skillarch/hypr-mode 2>/dev/null || echo "desktop")
 
 .PHONY: validate-wm-choice
 validate-wm-choice: ## Validate that WM_CHOICE is set correctly
@@ -48,16 +49,17 @@ prompt-wm-choice: ## Prompt user to choose window manager
 	@echo "  2) Hyprland (Wayland - Desktop) - Modern, animations, blur, eye candy"
 	@echo "  3) Hyprland (Wayland - VM)      - Optimized for VMs (no animations/blur)"
 	@echo ""
+	@mkdir -p $(SKA_CONFIG_DIR)
 	@read -p "Enter choice [1-3]: " choice; \
 	case $$choice in \
-		1) echo "i3" > /tmp/ska-wm-choice.txt ; rm -f /tmp/ska-hypr-mode.txt ;; \
-		2) echo "hyprland" > /tmp/ska-wm-choice.txt ; echo "desktop" > /tmp/ska-hypr-mode.txt ;; \
-		3) echo "hyprland" > /tmp/ska-wm-choice.txt ; echo "vm" > /tmp/ska-hypr-mode.txt ;; \
+		1) echo "i3" > $(SKA_CONFIG_DIR)/wm-choice ; rm -f $(SKA_CONFIG_DIR)/hypr-mode ;; \
+		2) echo "hyprland" > $(SKA_CONFIG_DIR)/wm-choice ; echo "desktop" > $(SKA_CONFIG_DIR)/hypr-mode ;; \
+		3) echo "hyprland" > $(SKA_CONFIG_DIR)/wm-choice ; echo "vm" > $(SKA_CONFIG_DIR)/hypr-mode ;; \
 		*) echo "❌ Invalid choice. Aborting."; exit 1 ;; \
 	esac
 	@echo ""
-	@echo "✅ Selected: $$(cat /tmp/ska-wm-choice.txt)"
-	@[ -f /tmp/ska-hypr-mode.txt ] && echo "   Hyprland mode: $$(cat /tmp/ska-hypr-mode.txt)" || true
+	@echo "✅ Selected: $$(cat $(SKA_CONFIG_DIR)/wm-choice)"
+	@[ -f $(SKA_CONFIG_DIR)/hypr-mode ] && echo "   Hyprland mode: $$(cat $(SKA_CONFIG_DIR)/hypr-mode)" || true
 	@echo ""
 
 install-base: sanity-check ## Install base packages
@@ -107,8 +109,9 @@ install-cli-tools: sanity-check ## Install system packages
 	# Install mise and all php-build dependencies
 	yes|sudo pacman -S --noconfirm --needed mise libedit libffi libjpeg-turbo libpcap libpng libxml2 libzip postgresql-libs php-gd
 	# mise self-update # Currently broken, wait for upstream fix, pinged on 17/03/2025
-	sleep 30
-	for package in usage pdm rust terraform golang python nodejs; do mise use -g "$$package@latest" ; sleep 10; done
+	for i in $$(seq 1 30); do command -v mise >/dev/null 2>&1 && break || sleep 1; done
+	command -v mise >/dev/null 2>&1 || { echo "ERROR: mise not found after install"; exit 1; }
+	for package in usage pdm rust terraform golang python nodejs; do mise use -g "$$package@latest" && mise exec -- true || { echo "ERROR: mise use $$package failed"; exit 1; }; done
 	mise exec -- go env -w "GOPATH=/home/$$USER/.local/go"
 	make clean
 
@@ -242,7 +245,7 @@ install-gui-hyprland: sanity-check ## Install Hyprland compositor (Wayland)
 
 	# Hyprland compositor packages
 	yes|sudo pacman -S --noconfirm --needed \
-		hyprland hyprlock hypridle hyprpaper hyprpicker \
+		hyprland hyprlock hypridle hyprpaper hyprpicker hyprsunset hyprcursor \
 		xdg-desktop-portal-hyprland
 
 	# Wayland status bar
@@ -253,13 +256,16 @@ install-gui-hyprland: sanity-check ## Install Hyprland compositor (Wayland)
 		dunst grim slurp wl-clipboard clipse wlr-randr
 
 	# Wayland support for Qt apps
-	yes|sudo pacman -S --noconfirm --needed qt5-wayland qt6-wayland
+	yes|sudo pacman -S --noconfirm --needed qt5-wayland qt6-wayland hyprland-qt-support
+
+	# Audio (PipeWire + WirePlumber)
+	yes|sudo pacman -S --noconfirm --needed pipewire wireplumber pipewire-pulse pipewire-alsa
 
 	# AUR packages
 	yay --noconfirm --needed -S hyprpolkitagent wlogout
 
 	# Create Hyprland config directories
-	mkdir -p ~/.config/hypr ~/.config/waybar ~/.config/waybar/scripts ~/.config/dunst ~/.config/clipse ~/.config/xdg-desktop-portal
+	mkdir -p ~/.config/hypr ~/.config/waybar ~/.config/dunst ~/.config/clipse ~/.config/xdg-desktop-portal
 
 	# Determine which Hyprland config to use (Desktop vs VM)
 	@if [ "$(HYPR_MODE)" = "vm" ]; then \
@@ -279,6 +285,10 @@ install-gui-hyprland: sanity-check ## Install Hyprland compositor (Wayland)
 	[ -f ~/.config/hypr/hyprpaper.conf ] && [ ! -L ~/.config/hypr/hyprpaper.conf ] && mv ~/.config/hypr/hyprpaper.conf ~/.config/hypr/hyprpaper.conf.skabak
 	ln -sf /opt/skillarch/config/hypr/hyprpaper.conf ~/.config/hypr/hyprpaper.conf
 
+	# hyprsunset config
+	[ -f ~/.config/hypr/hyprsunset.conf ] && [ ! -L ~/.config/hypr/hyprsunset.conf ] && mv ~/.config/hypr/hyprsunset.conf ~/.config/hypr/hyprsunset.conf.skabak
+	ln -sf /opt/skillarch/config/hypr/hyprsunset.conf ~/.config/hypr/hyprsunset.conf
+
 	# hyprlock config
 	[ -f ~/.config/hypr/hyprlock.conf ] && [ ! -L ~/.config/hypr/hyprlock.conf ] && mv ~/.config/hypr/hyprlock.conf ~/.config/hypr/hyprlock.conf.skabak
 	ln -sf /opt/skillarch/config/hypr/hyprlock.conf ~/.config/hypr/hyprlock.conf
@@ -294,10 +304,8 @@ install-gui-hyprland: sanity-check ## Install Hyprland compositor (Wayland)
 	ln -sf /opt/skillarch/config/hypr/waybar/style.css ~/.config/waybar/style.css
 
 	# waybar scripts
-	for script in bluetooth-status.sh display-swap.sh display-toggle.sh vpn-status.sh vpn-toggle.sh; do \
-		[ -f ~/.config/waybar/scripts/$$script ] && [ ! -L ~/.config/waybar/scripts/$$script ] && mv ~/.config/waybar/scripts/$$script ~/.config/waybar/scripts/$$script.skabak; \
-		ln -sf /opt/skillarch/config/hypr/waybar/scripts/$$script ~/.config/waybar/scripts/$$script; \
-	done
+	[ -d ~/.config/waybar/scripts ] && [ ! -L ~/.config/waybar/scripts ] && mv ~/.config/waybar/scripts ~/.config/waybar/scripts.skabak
+	ln -sfn /opt/skillarch/config/hypr/waybar/scripts ~/.config/waybar/scripts
 
 	# dunst config
 	[ -f ~/.config/dunst/dunstrc ] && [ ! -L ~/.config/dunst/dunstrc ] && mv ~/.config/dunst/dunstrc ~/.config/dunst/dunstrc.skabak
@@ -359,7 +367,7 @@ install-offensive: sanity-check ## Install offensive tools
 	mise exec -- go install github.com/glitchedgitz/cook/v2/cmd/cook@latest > /dev/null
 	mise exec -- go install github.com/x90skysn3k/brutespray@latest > /dev/null
 	mise exec -- go install github.com/sensepost/gowitness@latest > /dev/null
-	sleep 30
+	mise exec -- go version >/dev/null 2>&1 || { echo "ERROR: go not available via mise"; exit 1; }
 	zsh -c "source ~/.zshrc && pdtm -install-all -v"
 	zsh -c "source ~/.zshrc && nuclei -update-templates -update-template-dir ~/.nuclei-templates"
 

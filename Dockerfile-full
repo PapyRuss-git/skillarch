@@ -1,23 +1,9 @@
-FROM thelaluka/skillarch:lite
+# DEPRECATED: Dockerfile-full installs both i3 and Hyprland, causing package conflicts.
+# Use one of the following instead:
+#   - Dockerfile-full-i3       (i3 + X11)
+#   - Dockerfile-full-hyprland (Hyprland + Wayland)
 
-USER root
-RUN echo "hacker ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/hacker
-
-USER hacker
-WORKDIR /opt/skillarch
-
-# Install skillarch
-RUN make install-docker
-RUN make install-gui
-RUN make install-gui-tools
-RUN make install-wordlists
-RUN make install-hardening
-
-# Remove NOPASSWD capability after installation
-USER root
-RUN echo "hacker ALL=(ALL) ALL" > /etc/sudoers.d/hacker
-
-# Final setup
-USER hacker
-WORKDIR /home/hacker
-ENTRYPOINT ["/bin/zsh", "-il"]
+FROM alpine:3.19 AS deprecated
+RUN echo "ERROR: Dockerfile-full is deprecated." && \
+    echo "Use Dockerfile-full-i3 or Dockerfile-full-hyprland instead." && \
+    exit 1

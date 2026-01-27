@@ -1,4 +1,5 @@
 #!/bin/bash
+set -euo pipefail
 
 # Bluetooth Status Script for Waybar
 # Shows Bluetooth status with proper device type icons

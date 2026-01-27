@@ -1,4 +1,5 @@
 #!/bin/bash
+set -euo pipefail
 
 # VPN Toggle Script for Waybar
 # Toggles VPN connection on/off

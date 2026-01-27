@@ -7,7 +7,7 @@ USER hacker
 WORKDIR /opt/skillarch
 
 # Set WM choice to i3
-RUN echo "i3" > /tmp/ska-wm-choice.txt
+RUN mkdir -p ~/.config/skillarch && echo "i3" > ~/.config/skillarch/wm-choice
 
 # Install skillarch GUI components (i3 only)
 RUN make install-docker

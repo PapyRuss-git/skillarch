@@ -126,7 +126,7 @@ Centralized configuration with atomic symlink operations from `/opt/skillarch/co
 - **Dockerfile-full-hyprland**: Extends lite with Hyprland GUI components only (docker/gui/gui-tools/wordlists/hardening) - sets WM_CHOICE=hyprland
 
 **Build process**:
-Each full-* image sets the WM choice via `/tmp/ska-wm-choice.txt` before running `make install-gui`, which triggers the conditional installation logic:
+Each full-* image sets the WM choice via `~/.config/skillarch/wm-choice` before running `make install-gui`, which triggers the conditional installation logic:
 - `install-gui` → `install-gui-common` → `install-gui-wm` → `install-gui-{i3|hyprland}`
 
 **Security model**: NOPASSWD sudo only during installation, reverted to password-required afterward
@@ -252,7 +252,7 @@ No specific test framework - SkillArch is primarily a system configuration and t
 - Manual testing of desktop environments and tool functionality
 
 ## Security Architecture
-- **OpenSnitch**: Egress firewall (opt-in, should be enabled by default)
+- **OpenSnitch**: Egress firewall (opt-in)
 - **UFW**: Ingress firewall (Docker bypasses by default)
 - **Docker group**: Grants root-equivalent access (security consideration)
 - **Secret management**: Never commit credentials; use environment variables

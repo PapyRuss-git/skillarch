@@ -7,7 +7,7 @@ USER hacker
 WORKDIR /opt/skillarch
 
 # Set WM choice to Hyprland
-RUN echo "hyprland" > /tmp/ska-wm-choice.txt
+RUN mkdir -p ~/.config/skillarch && echo "hyprland" > ~/.config/skillarch/wm-choice
 
 # Install skillarch GUI components (Hyprland only)
 RUN make install-docker

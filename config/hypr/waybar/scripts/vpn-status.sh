@@ -1,4 +1,5 @@
 #!/bin/bash
+set -euo pipefail
 
 # VPN Status Script for Waybar
 # Shows current VPN connection status
