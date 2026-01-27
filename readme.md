@@ -117,7 +117,9 @@ make help
 - The main config is azerty (shhh I know), here is a reference to [tweak your config back to qwerty](https://github.com/CachyOS/cachyos-i3wm-settings/blob/develop/etc/skel/.config/i3/config)
 - Kitty visual/rectangle select is done with `ctrl+alt+click/drag`, you're welcome!
 - The docker `latest` is actually the `lite` image with everything CLI related
-- The docker `full` image contains GUI stuff and wordlists
+- The docker `full` image contains GUI stuff and wordlists (legacy, use `full-i3` or `full-hyprland` instead)
+- The docker `full-i3` image contains i3 GUI environment and wordlists
+- The docker `full-hyprland` image contains Hyprland GUI environment and wordlists
 - Why `sleep` in `Makefile`? Building TOO fast was triggering github limit-rate
 - No [CachyOs on ARM](https://discuss.cachyos.org/t/arm-future-for-cachyos/727), therefore no SkillArch on ARM.
 - Extensions are installed for VsCode. Cursor packaging is weird, so while it's open: `ctrl+shift+p` > `Import VsCode Extensions`
@@ -161,8 +163,28 @@ https://hub.docker.com/r/thelaluka/skillarch
 ```bash
 # lite image: CLI only
 make docker-run
-# full image: GUI stuff with X11 socket mounted!
+
+# full image (legacy): GUI stuff with X11 socket mounted
 make docker-run-full
+
+# full-i3 image: i3 window manager with X11
+make docker-run-full-i3
+
+# full-hyprland image: Hyprland compositor with Wayland
+make docker-run-full-hyprland
+```
+
+**Available Docker images:**
+- `lite`: CLI tools only (no GUI) - ~2GB
+- `full`: Legacy GUI image (installs both i3 and Hyprland) - ~5GB
+- `full-i3`: i3 window manager only (X11) - ~4GB
+- `full-hyprland`: Hyprland compositor only (Wayland) - ~4GB
+
+**Build images locally:**
+```bash
+make docker-build              # Build lite image
+make docker-build-full-i3      # Build i3 GUI image
+make docker-build-full-hyprland # Build Hyprland GUI image
 ```
 
 ### Main i3 bindings & aliases
@@ -257,7 +279,7 @@ bindsym $mod+Shift+p exec flameshot full -p ~/Pictures/
 bindsym $mod+s exec pavucontrol
 bindsym $mod+shift+s exec XDG_CURRENT_DESKTOP=GNOME gnome-control-center
 bindsym $mod+e exec emote
-bindsym $mod+b exec blueman-manager
+bindsym $mod+b exec XDG_CURRENT_DESKTOP=GNOME gnome-control-center bluetooth
 bindsym $mod+w exec XDG_CURRENT_DESKTOP=GNOME gnome-control-center wifi
 bindsym $mod+n exec nautilus
 bindsym $mod+v exec vlc
@@ -269,13 +291,58 @@ bindsym $mod+k exec cursor
 
 - For an exhaustive view inspect [/Makefile](/Makefile)
 
+#### Common Packages (Both i3 & Hyprland)
+
 ```bash
-# Pacman Packages
-arandr asciinema base-devel bat bettercap bison blueman bottom brightnessctl burpsuite bzip2 ca-certificates cheese cloc cmake code code-marketplace curl discord dmenu docker docker-compose dos2unix dragon-drop-git dunst emote exa expect fastfetch feh ffmpeg filezilla flameshot foremost fq fx gdb ghex ghidra git git-delta gitleaks glow gnupg google-chrome gparted gron guvcview hashcat htmlq htop hwinfo i3-gaps i3blocks i3lock i3lock-fancy-git i3status icu inotify-tools iproute2 jless jq kdenlive kitty kompare lazygit libedit libffi libjpeg-turbo libpcap libpng libreoffice-fresh libxml2 libzip llvm lsof ltrace make meld metasploit mise mlocate mplayer ncurses neovim net-tools ngrep nm-connection-editor nmap nomachine obs-studio-browser okular opensnitch openssh openssl parallel perl-image-exiftool php-gd picom pkgconf polybar postgresql-libs python-virtualenv qbittorrent re2c readline ripgrep rlwrap rofi signal-desktop socat sqlite sshpass superfile sysstat tmate tmux tor torbrowser-launcher traceroute trash-cli tree unzip vbindiff veracrypt vim viu vlc-luajit websocat wget wireshark-qt xclip xsv xz yay zip zsh zsh-autosuggestions zsh-completions zsh-history-substring-search zsh-syntax-highlighting zsh-theme-powerlevel10k cronie audacity xorg-xhost gnu-netcat archlinux-keyring jdk21-openjdk polkit-gnome
+# Pacman Packages - Base System
+asciinema base-devel bat bettercap bison bottom brightnessctl burpsuite bzip2 ca-certificates
+cheese cloc cmake code code-marketplace curl discord docker docker-compose dos2unix
+emote exa expect fastfetch ffmpeg filezilla foremost fq fx gdb ghex ghidra git git-delta
+gitleaks glow gnupg google-chrome gparted gron guvcview hashcat htmlq htop hwinfo
+icu inotify-tools iproute2 jless jq kdenlive kitty kompare lazygit libedit libffi
+libjpeg-turbo libpcap libpng libreoffice-fresh libxml2 libzip llvm lsof ltrace make meld
+metasploit mise mlocate mplayer ncurses neovim net-tools ngrep nm-connection-editor nmap
+nomachine obs-studio-browser okular opensnitch openssh openssl parallel perl-image-exiftool
+php-gd pkgconf postgresql-libs python-virtualenv qbittorrent re2c readline ripgrep rlwrap
+rofi signal-desktop socat sqlite sshpass superfile sysstat tmate tmux tor torbrowser-launcher
+traceroute trash-cli tree unzip vbindiff veracrypt vim viu vlc-luajit websocat wget
+wireshark-qt xsv xz yay zip zsh zsh-autosuggestions zsh-completions zsh-history-substring-search
+zsh-syntax-highlighting cronie audacity gnu-netcat archlinux-keyring jdk21-openjdk
 
-# Yay packages
-ffuf gau pdtm-bin waybackurls cursor-bin fswebcam i3-battery-popup-git python-pipx rofi-power-menu fabric-ai-bin
+# Pacman Packages - GUI Common
+arandr pavucontrol brightnessctl nautilus file-roller gnome-control-center gnome-bluetooth-3.0
+gnome-keyring ttf-dejavu ttf-liberation noto-fonts noto-fonts-emoji ttf-jetbrains-mono-nerd
+ttf-firacode-nerd
 
+# Yay packages - Common
+ffuf gau pdtm-bin waybackurls cursor-bin fswebcam python-pipx rofi-power-menu fabric-ai-bin
+```
+
+#### i3 Specific Packages (X11)
+
+```bash
+# Pacman Packages - i3/X11
+i3-gaps i3blocks i3status picom polybar feh flameshot xss-lock xorg-server xorg-xinit
+xorg-xrandr xclip xdotool maim xdg-desktop-portal-gtk polkit-gnome
+
+# Yay packages - i3/X11
+i3lock i3lock-fancy-git i3-battery-popup-git
+```
+
+#### Hyprland Specific Packages (Wayland)
+
+```bash
+# Pacman Packages - Hyprland/Wayland
+hyprland hyprlock hypridle hyprpaper waybar grim slurp wl-clipboard dunst
+qt5-wayland qt6-wayland xdg-desktop-portal-hyprland swayidle
+
+# Yay packages - Hyprland/Wayland
+hyprpolkitagent clipse wlogout hyprcursor
+```
+
+#### Language-Specific & CLI Tools
+
+```bash
 # Mise tools
 usage pdm rust terraform golang python nodejs
 
@@ -283,13 +350,16 @@ usage pdm rust terraform golang python nodejs
 sw33tLie/sns glitchedgitz/cook x90skysn3k/brutespray sensepost/gowitness
 
 # Pdtm tools
-aix alterx asnmap cdncheck chaos-client cloudlist cvemap dnsx httpx interactsh-client interactsh-server katana mapcidr naabu notify nuclei proxify shuffledns simplehttpserver subfinder tldfinder tlsx tunnelx uncover urlfinder
+aix alterx asnmap cdncheck chaos-client cloudlist cvemap dnsx httpx interactsh-client
+interactsh-server katana mapcidr naabu notify nuclei proxify shuffledns simplehttpserver
+subfinder tldfinder tlsx tunnelx uncover urlfinder
 
 # Pipx tools
 argcomplete bypass-url-parser dirsearch exegol pre-commit sqlmap wafw00f yt-dlp semgrep
 
 # OMZ plugins
-colored-man-pages docker extract fzf mise npm terraform tmux zsh-autosuggestions zsh-completions zsh-syntax-highlighting ssh-agent
+colored-man-pages docker extract fzf mise npm terraform tmux zsh-autosuggestions
+zsh-completions zsh-syntax-highlighting ssh-agent
 
 # VsCode Extensions
 bibhasdn.unique-lines
@@ -336,6 +406,8 @@ https://github.com/Karanxa/Bug-Bounty-Wordlists
 https://github.com/tarraschk/richelieu
 https://github.com/p0dalirius/webapp-wordlists
 ```
+
+> **Note:** SkillArch is transitioning to support both i3 (X11) and Hyprland (Wayland). The package lists above show the current state. In future releases, you'll be able to choose your window manager at installation time, with packages automatically filtered to avoid installing incompatible components.
 
 ### Security
 

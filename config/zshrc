@@ -9,9 +9,16 @@ export ZSH="$HOME/.oh-my-zsh"
 # load a random theme each time Oh My Zsh is loaded, in which case,
 # to know which specific one was loaded, run: echo $RANDOM_THEME
 # See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
-ZSH_THEME="af-magic"
+# ZSH_THEME disabled for Starship
+# ZSH_THEME="af-magic-everforest"
 DISABLE_MAGIC_FUNCTIONS="true"
-ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=245"
+ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#5C6A72"
+
+# Load custom theme from config directory - disabled for Starship
+# if [[ -f "/opt/skillarch/config/everforest-hyprland.zsh-theme" ]]; then
+#     source "/opt/skillarch/config/everforest-hyprland.zsh-theme"
+#     ZSH_THEME=""
+# fi
 
 # Set list of themes to pick from when loading at random
 # Setting this variable when ZSH_THEME=random will cause zsh to load
@@ -119,3 +126,15 @@ eval "$(register-python-argcomplete --no-defaults exegol)"
 # Created by `pipx` on 2025-03-03 15:05:01
 export PATH=$PATH:~/.local/bin
 export PATH=$PATH:~/.pdtm/go/bin
+
+# Initialize Starship prompt
+export STARSHIP_CONFIG="/opt/skillarch/config/starship.toml"
+eval "$(starship init zsh)"
+
+# pnpm
+export PNPM_HOME="/home/papyruss/.local/share/pnpm"
+case ":$PATH:" in
+  *":$PNPM_HOME:"*) ;;
+  *) export PATH="$PNPM_HOME:$PATH" ;;
+esac
+# pnpm end

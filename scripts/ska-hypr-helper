@@ -1,0 +1,232 @@
+#!/usr/bin/env bash
+
+# SkillArch Hyprland Helper
+# Outil de gestion rapide pour Hyprland
+
+set -e
+
+# Colors Everforest
+GREEN='\033[38;2;167;192;128m'
+BLUE='\033[38;2;127;187;179m'
+YELLOW='\033[38;2;219;188;127m'
+RED='\033[38;2;230;126;128m'
+AQUA='\033[38;2;131;192;146m'
+NC='\033[0m'
+
+# Functions
+show_help() {
+    echo -e "${GREEN}SkillArch Hyprland Helper${NC}"
+    echo ""
+    echo "Usage: ska-hypr-helper [command]"
+    echo ""
+    echo "Commands:"
+    echo -e "  ${AQUA}info${NC}              Afficher les informations système"
+    echo -e "  ${AQUA}reload${NC}            Recharger la configuration"
+    echo -e "  ${AQUA}restart${NC}           Redémarrer Hyprland"
+    echo -e "  ${AQUA}toggle-anim${NC}       Basculer les animations"
+    echo -e "  ${AQUA}toggle-blur${NC}       Basculer le blur"
+    echo -e "  ${AQUA}monitors${NC}          Lister les moniteurs"
+    echo -e "  ${AQUA}windows${NC}           Lister les fenêtres actives"
+    echo -e "  ${AQUA}workspaces${NC}        Lister les workspaces"
+    echo -e "  ${AQUA}night-light${NC}       Toggle le filtre lumière bleue"
+    echo -e "  ${AQUA}wallpaper${NC}         Changer le fond d'écran"
+    echo -e "  ${AQUA}lock${NC}              Verrouiller l'écran"
+    echo -e "  ${AQUA}idle-status${NC}       Statut de hypridle"
+    echo -e "  ${AQUA}performance${NC}       Mode performance (désactive blur/anim)"
+    echo -e "  ${AQUA}beauty${NC}            Mode beauté (active blur/anim)"
+    echo -e "  ${AQUA}help${NC}              Afficher cette aide"
+    echo ""
+}
+
+show_info() {
+    echo -e "${GREEN}=== Informations Hyprland ===${NC}"
+    echo ""
+
+    # Version Hyprland
+    echo -e "${BLUE}Version Hyprland:${NC}"
+    hyprctl version | head -1
+    echo ""
+
+    # Moniteurs
+    echo -e "${BLUE}Moniteurs actifs:${NC}"
+    hyprctl monitors | grep -E "(Monitor|resolution|scale|transform)" | head -12
+    echo ""
+
+    # Workspaces
+    echo -e "${BLUE}Workspaces:${NC}"
+    hyprctl workspaces | grep -E "(workspace|windows)" | head -10
+    echo ""
+
+    # Composants Hypr Ecosystem
+    echo -e "${BLUE}Composants actifs:${NC}"
+    pgrep -a hypridle && echo -e "${GREEN}✓${NC} hypridle" || echo -e "${RED}✗${NC} hypridle"
+    pgrep -a hyprpaper && echo -e "${GREEN}✓${NC} hyprpaper" || echo -e "${RED}✗${NC} hyprpaper"
+    pgrep -a waybar && echo -e "${GREEN}✓${NC} waybar" || echo -e "${RED}✗${NC} waybar"
+    pgrep -a dunst && echo -e "${GREEN}✓${NC} dunst" || echo -e "${RED}✗${NC} dunst"
+    pgrep -a clipse && echo -e "${GREEN}✓${NC} clipse" || echo -e "${RED}✗${NC} clipse"
+    echo ""
+}
+
+reload_config() {
+    echo -e "${YELLOW}Rechargement de la configuration Hyprland...${NC}"
+    hyprctl reload
+    echo -e "${GREEN}✓ Configuration rechargée${NC}"
+}
+
+restart_hyprland() {
+    echo -e "${YELLOW}Redémarrage de Hyprland...${NC}"
+    hyprctl dispatch exit
+}
+
+toggle_animations() {
+    current=$(hyprctl getoption animations:enabled | grep "int: 1" || true)
+    if [ -n "$current" ]; then
+        hyprctl keyword animations:enabled 0
+        echo -e "${YELLOW}Animations désactivées${NC}"
+    else
+        hyprctl keyword animations:enabled 1
+        echo -e "${GREEN}Animations activées${NC}"
+    fi
+}
+
+toggle_blur() {
+    current=$(hyprctl getoption decoration:blur:enabled | grep "int: 1" || true)
+    if [ -n "$current" ]; then
+        hyprctl keyword decoration:blur:enabled 0
+        echo -e "${YELLOW}Blur désactivé${NC}"
+    else
+        hyprctl keyword decoration:blur:enabled 1
+        echo -e "${GREEN}Blur activé${NC}"
+    fi
+}
+
+list_monitors() {
+    echo -e "${GREEN}=== Moniteurs ===${NC}"
+    hyprctl monitors
+}
+
+list_windows() {
+    echo -e "${GREEN}=== Fenêtres actives ===${NC}"
+    hyprctl clients | grep -E "(class|title|workspace|at:|size:)" | head -30
+}
+
+list_workspaces() {
+    echo -e "${GREEN}=== Workspaces ===${NC}"
+    hyprctl workspaces
+}
+
+toggle_night_light() {
+    if pgrep -x hyprsunset > /dev/null; then
+        killall hyprsunset
+        echo -e "${YELLOW}Filtre lumière bleue désactivé${NC}"
+    else
+        hyprsunset -t 4500 &
+        echo -e "${GREEN}Filtre lumière bleue activé (4500K)${NC}"
+    fi
+}
+
+change_wallpaper() {
+    echo -e "${BLUE}Sélectionnez un fond d'écran:${NC}"
+    wallpaper=$(find ~/Images ~/Pictures /opt/skillarch/assets -type f \( -iname "*.jpg" -o -iname "*.png" \) 2>/dev/null | fzf --preview 'kitty +kitten icat --clear --transfer-mode=memory --stdin=no --place=80x40@0x0 {} 2>/dev/null')
+
+    if [ -n "$wallpaper" ]; then
+        hyprctl hyprpaper preload "$wallpaper"
+        hyprctl hyprpaper wallpaper ",$wallpaper"
+        echo -e "${GREEN}✓ Fond d'écran changé: $wallpaper${NC}"
+    fi
+}
+
+lock_screen() {
+    echo -e "${YELLOW}Verrouillage de l'écran...${NC}"
+    hyprlock
+}
+
+idle_status() {
+    echo -e "${GREEN}=== Statut hypridle ===${NC}"
+    if pgrep -x hypridle > /dev/null; then
+        echo -e "${GREEN}✓ hypridle est actif${NC}"
+        echo ""
+        echo "Configuration actuelle (/opt/skillarch/config/hypr/hypridle.conf):"
+        cat /opt/skillarch/config/hypr/hypridle.conf | grep -A1 "timeout ="
+    else
+        echo -e "${RED}✗ hypridle n'est pas actif${NC}"
+        echo "Lancez: hypridle &"
+    fi
+}
+
+performance_mode() {
+    echo -e "${YELLOW}Activation du mode performance...${NC}"
+    hyprctl keyword animations:enabled 0
+    hyprctl keyword decoration:blur:enabled 0
+    hyprctl keyword decoration:shadow:enabled 0
+    echo -e "${GREEN}✓ Mode performance activé${NC}"
+    echo -e "${BLUE}  - Animations: OFF${NC}"
+    echo -e "${BLUE}  - Blur: OFF${NC}"
+    echo -e "${BLUE}  - Shadows: OFF${NC}"
+}
+
+beauty_mode() {
+    echo -e "${YELLOW}Activation du mode beauté...${NC}"
+    hyprctl keyword animations:enabled 1
+    hyprctl keyword decoration:blur:enabled 1
+    hyprctl keyword decoration:shadow:enabled 1
+    echo -e "${GREEN}✓ Mode beauté activé${NC}"
+    echo -e "${BLUE}  - Animations: ON${NC}"
+    echo -e "${BLUE}  - Blur: ON${NC}"
+    echo -e "${BLUE}  - Shadows: ON${NC}"
+}
+
+# Main
+case "${1:-help}" in
+    info)
+        show_info
+        ;;
+    reload)
+        reload_config
+        ;;
+    restart)
+        restart_hyprland
+        ;;
+    toggle-anim)
+        toggle_animations
+        ;;
+    toggle-blur)
+        toggle_blur
+        ;;
+    monitors)
+        list_monitors
+        ;;
+    windows)
+        list_windows
+        ;;
+    workspaces)
+        list_workspaces
+        ;;
+    night-light)
+        toggle_night_light
+        ;;
+    wallpaper)
+        change_wallpaper
+        ;;
+    lock)
+        lock_screen
+        ;;
+    idle-status)
+        idle_status
+        ;;
+    performance)
+        performance_mode
+        ;;
+    beauty)
+        beauty_mode
+        ;;
+    help|--help|-h)
+        show_help
+        ;;
+    *)
+        echo -e "${RED}Commande inconnue: $1${NC}"
+        echo ""
+        show_help
+        exit 1
+        ;;
+esac

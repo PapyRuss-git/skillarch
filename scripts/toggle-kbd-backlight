@@ -1,0 +1,35 @@
+#!/bin/bash
+# Toggle ThinkPad keyboard backlight
+# Levels: 0 (off), 1 (dim), 2 (bright)
+
+BACKLIGHT_PATH="/sys/class/leds/tpacpi::kbd_backlight/brightness"
+MAX_BRIGHTNESS_PATH="/sys/class/leds/tpacpi::kbd_backlight/max_brightness"
+
+# Check if backlight exists
+if [ ! -f "$BACKLIGHT_PATH" ]; then
+    notify-send "Keyboard Backlight" "No keyboard backlight found" -u critical
+    exit 1
+fi
+
+# Get current and max brightness
+CURRENT=$(cat "$BACKLIGHT_PATH")
+MAX=$(cat "$MAX_BRIGHTNESS_PATH")
+
+# Calculate next brightness level (cycle: 0 -> 1 -> 2 -> 0)
+NEXT=$(( (CURRENT + 1) % (MAX + 1) ))
+
+# Set new brightness
+echo "$NEXT" | sudo tee "$BACKLIGHT_PATH" > /dev/null
+
+# Send notification
+case $NEXT in
+    0)
+        notify-send "Keyboard Backlight" "Off" -t 1000
+        ;;
+    1)
+        notify-send "Keyboard Backlight" "Dim" -t 1000
+        ;;
+    2)
+        notify-send "Keyboard Backlight" "Bright" -t 1000
+        ;;
+esac

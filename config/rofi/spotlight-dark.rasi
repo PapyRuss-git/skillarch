@@ -1,15 +1,15 @@
-/* MACOS SPOTLIGHT LIKE DARK THEME FOR ROFI  */
-/* Author: Newman Sanchez (https://github.com/newmanls) */
+/* EVERFOREST THEME FOR ROFI */
+/* Based on MacOS Spotlight by Newman Sanchez - Modified for EverForest */
 
 * {
 
-    bg0:    #242424E6;
-    bg1:    #7E7E7E80;
-    bg2:    #0860f2E6;
+    bg0:    #1E2326E6;
+    bg1:    #5C6A7280;
+    bg2:    #A7C080E6;
 
-    fg0:    #DEDEDE;
-    fg1:    #FFFFFF;
-    fg2:    #DEDEDE80;
+    fg0:    #D3C6AA;
+    fg1:    #D3C6AA;
+    fg2:    #D3C6AA80;
 
     background-color:   transparent;
     text-color:         @fg0;

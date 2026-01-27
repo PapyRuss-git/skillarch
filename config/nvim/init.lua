@@ -2,6 +2,11 @@
 require("config.lazy")
 vim.opt.mouse = ""
 
+-- EverForest colorscheme configuration
+vim.g.everforest_background = 'hard'
+vim.g.everforest_better_performance = 1
+vim.cmd('colorscheme everforest')
+
 -- Function to apply transparency settings globally
 local function set_transparency()
   vim.cmd([[

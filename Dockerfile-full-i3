@@ -1,0 +1,26 @@
+FROM thelaluka/skillarch:lite
+
+USER root
+RUN echo "hacker ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/hacker
+
+USER hacker
+WORKDIR /opt/skillarch
+
+# Set WM choice to i3
+RUN echo "i3" > /tmp/ska-wm-choice.txt
+
+# Install skillarch GUI components (i3 only)
+RUN make install-docker
+RUN make install-gui
+RUN make install-gui-tools
+RUN make install-wordlists
+RUN make install-hardening
+
+# Remove NOPASSWD capability after installation
+USER root
+RUN echo "hacker ALL=(ALL) ALL" > /etc/sudoers.d/hacker
+
+# Final setup
+USER hacker
+WORKDIR /home/hacker
+ENTRYPOINT ["/bin/zsh", "-il"]

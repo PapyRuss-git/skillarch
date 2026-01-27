@@ -1,0 +1,259 @@
+/* Waybar Style for SkillArch + Hyprland - Everforest Theme with Transparent Blur Groups */
+
+* {
+    border: none;
+    border-radius: 7px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    font-weight: bold;
+    min-height: 0;
+}
+
+window#waybar {
+    background-color: transparent;
+    color: #D3C6AA;
+    transition-property: background-color;
+    transition-duration: .5s;
+}
+
+/* Group containers with transparent effect */
+.modules-left,
+.modules-center,
+.modules-right {
+    background-color: rgba(30, 35, 38, 0.65);
+    border: 1px solid rgba(211, 198, 170, 0.25);
+    border-radius: 9px;
+    margin: 2px;
+    padding: 2px 5px;
+    box-shadow: none;
+}
+
+window#waybar.hidden {
+    opacity: 0.2;
+}
+
+button {
+    box-shadow: inset 0 -2px transparent;
+    border: none;
+    border-radius: 6px;
+}
+
+button:hover {
+    background: inherit;
+    box-shadow: inset 0 -3px #A7C080;
+}
+
+#workspaces button {
+    padding: 0 6px;
+    background-color: #272E33;
+    color: #D3C6AA;
+    border: 1px solid rgba(211, 198, 170, 0.1);
+    margin: 1px;
+    border-radius: 7px;
+    transition: all 0.3s ease;
+    min-width: 20px;
+}
+
+#workspaces button:hover {
+    background: rgba(167, 192, 128, 0.4);
+    border: 1px solid rgba(167, 192, 128, 0.5);
+    box-shadow: 0 2px 4px rgba(167, 192, 128, 0.2);
+}
+
+#workspaces button.active,
+#workspaces button.focused {
+    background-color: #272E33;
+    color: #D3C6AA;
+    border: 2px solid #A7C080;
+    box-shadow: 0 0 4px rgba(167, 192, 128, 0.3);
+}
+
+#workspaces button.urgent {
+    background-color: rgba(230, 126, 128, 0.8);
+    color: #1E2326;
+    border: 1px solid rgba(230, 126, 128, 0.6);
+    animation: urgent-blink 1s infinite;
+}
+
+#mode {
+    background-color: #A7C080;
+    border-bottom: 3px solid #83C092;
+    color: #1E2326;
+}
+
+#clock,
+#battery,
+#backlight,
+#network,
+#pulseaudio,
+#custom-bluetooth,
+#custom-vpn,
+#custom-display-toggle,
+#tray,
+#mode,
+#idle_inhibitor {
+    padding: 3px 7px;
+    margin: 1px;
+    border-radius: 7px;
+    color: #D3C6AA;
+    background-color: #272E33;
+    border: 1px solid rgba(211, 198, 170, 0.2);
+    transition: all 0.3s ease;
+    box-shadow: none;
+}
+
+#clock:hover,
+#battery:hover,
+#backlight:hover,
+#network:hover,
+#pulseaudio:hover,
+#custom-bluetooth:hover,
+#custom-vpn:hover,
+#custom-display-toggle:hover,
+#tray:hover {
+    border: 1px solid rgba(211, 198, 170, 0.3);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+#window {
+    margin: 0 2px;
+    padding: 2px 6px;
+    background-color: #272E33;
+    border: 1px solid rgba(211, 198, 170, 0.15);
+    border-radius: 7px;
+    color: #D3C6AA;
+    box-shadow: none;
+    min-width: 0;
+}
+
+
+
+.modules-left > widget:first-child > #workspaces {
+    margin-left: 0;
+}
+
+.modules-right > widget:last-child > #workspaces {
+    margin-right: 0;
+}
+
+#clock {
+    background-color: transparent;
+    border: none;
+    box-shadow: none;
+    font-weight: bold;
+}
+
+#battery {
+    background-color: #374145;
+    color: #D3C6AA;
+}
+
+#battery.charging, #battery.plugged {
+    color: #1E2326;
+    background-color: #A7C080;
+}
+
+@keyframes blink {
+    to {
+        background-color: #ffffff;
+        color: #000000;
+    }
+}
+
+#battery.critical:not(.charging),
+#battery.warning:not(.charging) {
+    background-color: #E67E80;
+    color: #1E2326;
+    animation-name: blink;
+    animation-duration: 0.5s;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
+}
+
+@keyframes urgent-blink {
+    0% { opacity: 1; }
+    50% { opacity: 0.7; }
+    100% { opacity: 1; }
+}
+
+label:focus {
+    background-color: rgba(0, 0, 0, 0.3);
+}
+
+
+#backlight {
+    background-color: #374145;
+    color: #D3C6AA;
+}
+
+#network {
+    background-color: #374145;
+    color: #D3C6AA;
+}
+
+#network.disconnected {
+    background-color: #E67E80;
+    color: #1E2326;
+    border: 1px solid #E67E80;
+}
+
+#pulseaudio {
+    background-color: #374145;
+    color: #D3C6AA;
+}
+
+#pulseaudio.muted {
+    background-color: #1E2326;
+    color: #D3C6AA;
+}
+
+#tray {
+    background-color: #374145;
+    color: #D3C6AA;
+}
+
+#tray > .passive {
+    -gtk-icon-effect: dim;
+}
+
+#tray > .needs-attention {
+    -gtk-icon-effect: highlight;
+    background-color: #E67E80;
+    border: 1px solid #E67E80;
+}
+
+/* Bluetooth styling */
+#custom-bluetooth {
+    background-color: #374145;
+    color: #D3C6AA;
+}
+
+#custom-bluetooth.disconnected {
+    background-color: #7A8478;
+    color: #D3C6AA;
+}
+
+#custom-bluetooth.off {
+    background-color: #5C6A72;
+    color: #D3C6AA;
+}
+
+/* VPN styling */
+#custom-vpn {
+    background-color: #374145;
+    color: #D3C6AA;
+    font-weight: bold;
+}
+
+#custom-vpn.disconnected {
+    background-color: #374145;
+    color: #E67E80;
+}
+
+/* Display toggle styling */
+#custom-display-toggle {
+    background-color: #374145;
+    color: #D3C6AA;
+}
+

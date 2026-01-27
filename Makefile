@@ -9,7 +9,7 @@ help: ## Show this help message
 	@awk 'BEGIN {FS = ":.*##"; printf "\n"} /^[a-zA-Z0-9_-]+:.*?##/ { printf "  %-18s %s\n", $$1, $$2 } /^##@/ { printf "\n%s\n", substr($$0, 5) } ' $(MAKEFILE_LIST)
 	@echo ''
 
-install: install-base install-cli-tools install-shell install-docker install-gui install-gui-tools install-offensive install-wordlists install-hardening clean ## Install SkillArch
+install: prompt-wm-choice install-base install-cli-tools install-shell install-docker install-gui install-gui-tools install-offensive install-wordlists install-hardening clean ## Install SkillArch
 	@echo "You are all set up! Enjoy ! 🌹"
 
 sanity-check:
@@ -17,6 +17,48 @@ sanity-check:
 	@# Ensure we are in /opt/skillarch or /opt/skillarch-original (maintainer only)
 	@[ "$$(pwd)" != "/opt/skillarch" ] && [ "$$(pwd)" != "/opt/skillarch-original" ] && echo "You must be in /opt/skillarch or /opt/skillarch-original to run this command" && exit 1
 	@sudo id || (echo "Error: sudo access is required" ; exit 1)
+
+# Window Manager Choice Variables
+WM_CHOICE := $(shell cat /tmp/ska-wm-choice.txt 2>/dev/null || echo "")
+HYPR_MODE := $(shell cat /tmp/ska-hypr-mode.txt 2>/dev/null || echo "desktop")
+
+.PHONY: validate-wm-choice
+validate-wm-choice: ## Validate that WM_CHOICE is set correctly
+	@if [ -z "$(WM_CHOICE)" ]; then \
+		echo "❌ ERROR: WM_CHOICE not set. Run 'make prompt-wm-choice' first."; \
+		exit 1; \
+	fi
+	@if [ "$(WM_CHOICE)" != "i3" ] && [ "$(WM_CHOICE)" != "hyprland" ]; then \
+		echo "❌ ERROR: Invalid WM_CHOICE '$(WM_CHOICE)'. Must be 'i3' or 'hyprland'."; \
+		exit 1; \
+	fi
+	@echo "✅ WM_CHOICE validated: $(WM_CHOICE)"
+	@if [ "$(WM_CHOICE)" = "hyprland" ]; then \
+		echo "   Hyprland mode: $(HYPR_MODE)"; \
+	fi
+
+.PHONY: prompt-wm-choice
+prompt-wm-choice: ## Prompt user to choose window manager
+	@echo "════════════════════════════════════════════════════════"
+	@echo "  SkillArch Window Manager Selection"
+	@echo "════════════════════════════════════════════════════════"
+	@echo ""
+	@echo "Choose your window manager:"
+	@echo "  1) i3-gaps (X11)                - Stable, mature, low resource usage"
+	@echo "  2) Hyprland (Wayland - Desktop) - Modern, animations, blur, eye candy"
+	@echo "  3) Hyprland (Wayland - VM)      - Optimized for VMs (no animations/blur)"
+	@echo ""
+	@read -p "Enter choice [1-3]: " choice; \
+	case $$choice in \
+		1) echo "i3" > /tmp/ska-wm-choice.txt ; rm -f /tmp/ska-hypr-mode.txt ;; \
+		2) echo "hyprland" > /tmp/ska-wm-choice.txt ; echo "desktop" > /tmp/ska-hypr-mode.txt ;; \
+		3) echo "hyprland" > /tmp/ska-wm-choice.txt ; echo "vm" > /tmp/ska-hypr-mode.txt ;; \
+		*) echo "❌ Invalid choice. Aborting."; exit 1 ;; \
+	esac
+	@echo ""
+	@echo "✅ Selected: $$(cat /tmp/ska-wm-choice.txt)"
+	@[ -f /tmp/ska-hypr-mode.txt ] && echo "   Hyprland mode: $$(cat /tmp/ska-hypr-mode.txt)" || true
+	@echo ""
 
 install-base: sanity-check ## Install base packages
 	# Clean up, Update, Basics
@@ -47,7 +89,7 @@ install-base: sanity-check ## Install base packages
 	make clean
 
 install-cli-tools: sanity-check ## Install system packages
-	yes|sudo pacman -S --noconfirm --needed base-devel bison bzip2 ca-certificates cloc cmake dos2unix expect ffmpeg foremost gdb gnupg htop bottom hwinfo icu inotify-tools iproute2 jq llvm lsof ltrace make mlocate mplayer ncurses net-tools ngrep nmap openssh openssl parallel perl-image-exiftool pkgconf python-virtualenv re2c readline ripgrep rlwrap socat gnu-netcat sqlite sshpass tmate tor traceroute trash-cli tree unzip vbindiff xclip xz yay zip veracrypt git-delta viu xsv asciinema htmlq neovim glow jless websocat superfile gron eza fastfetch bat sysstat cronie
+	yes|sudo pacman -S --noconfirm --needed base-devel bison bzip2 ca-certificates cloc cmake dos2unix expect ffmpeg foremost gdb gnupg htop bottom hwinfo icu inotify-tools iproute2 jq llvm lsof ltrace make mlocate mplayer ncurses net-tools ngrep nmap openssh openssl parallel perl-image-exiftool pkgconf python-virtualenv re2c readline ripgrep rlwrap socat gnu-netcat sqlite sshpass tmate tor traceroute trash-cli tree unzip vbindiff xclip xz yay zip veracrypt git-delta viu xsv asciinema htmlq neovim glow jless websocat superfile gron eza fastfetch bat sysstat cronie starship
 	sudo ln -sf /usr/bin/bat /usr/local/bin/batcat
 	bash -c "$$(curl -fsSL https://gef.blah.cat/sh)"
 	# eza doesn't need the libgit2 workaround that exa required
@@ -102,11 +144,71 @@ install-docker: sanity-check ## Install docker
 	[ ! -f /.dockerenv ] && sudo systemctl enable --now docker
 	make clean
 
-install-gui: sanity-check ## Install gui, i3, polybar, kitty, rofi, picom
-	[ ! -f /etc/machine-id ] && sudo systemd-machine-id-setup
-	yes|sudo pacman -S --noconfirm --needed i3-gaps i3blocks i3lock i3lock-fancy-git i3status dmenu feh rofi nm-connection-editor picom polybar kitty brightnessctl xorg-xhost
-	yay --noconfirm --needed -S rofi-power-menu i3-battery-popup-git
+.PHONY: install-gui-common
+install-gui-common: sanity-check ## Install common GUI packages (X11 + Wayland compatible)
+	# Common terminal & fonts
+	yes|sudo pacman -S --noconfirm --needed \
+		kitty \
+		ttf-dejavu ttf-liberation noto-fonts noto-fonts-emoji \
+		ttf-jetbrains-mono-nerd ttf-firacode-nerd ttf-meslo-nerd
+
+	# Common launcher (works on both X11 and Wayland)
+	yes|sudo pacman -S --noconfirm --needed rofi
+
+	# Common audio & brightness
+	yes|sudo pacman -S --noconfirm --needed pavucontrol brightnessctl
+
+	# Common file manager & utilities
+	yes|sudo pacman -S --noconfirm --needed nautilus file-roller arandr
+
+	# Common GNOME components (X11/Wayland compatible)
+	yes|sudo pacman -S --noconfirm --needed \
+		gnome-control-center \
+		gnome-bluetooth-3.0 \
+		gnome-keyring \
+		gnome-settings-daemon \
+		bluez bluez-utils
+
+	# Common network manager
+	yes|sudo pacman -S --noconfirm --needed nm-connection-editor
+
+	# Enable Bluetooth service (do not start services in docker)
+	[ ! -f /.dockerenv ] && sudo systemctl enable --now bluetooth.service
+
+	# Dark mode preference
 	gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark'
+
+	# kitty config (common)
+	[ ! -d ~/.config/kitty ] && mkdir -p ~/.config/kitty
+	[ -f ~/.config/kitty/kitty.conf ] && [ ! -L ~/.config/kitty/kitty.conf ] && mv ~/.config/kitty/kitty.conf ~/.config/kitty/kitty.conf.skabak
+	ln -sf /opt/skillarch/config/kitty/kitty.conf ~/.config/kitty/kitty.conf
+
+	# rofi config (common)
+	[ ! -d ~/.config/rofi ] && mkdir -p ~/.config/rofi
+	[ -f ~/.config/rofi/config.rasi ] && [ ! -L ~/.config/rofi/config.rasi ] && mv ~/.config/rofi/config.rasi ~/.config/rofi/config.rasi.skabak
+	ln -sf /opt/skillarch/config/rofi/config.rasi ~/.config/rofi/config.rasi
+	make clean
+
+.PHONY: install-gui-i3
+install-gui-i3: sanity-check ## Install i3 window manager (X11)
+	[ ! -f /etc/machine-id ] && sudo systemd-machine-id-setup
+
+	# i3 window manager packages
+	yes|sudo pacman -S --noconfirm --needed \
+		i3-gaps i3blocks i3lock i3lock-fancy-git i3status \
+		polybar picom dmenu
+
+	# X11 utilities
+	yes|sudo pacman -S --noconfirm --needed \
+		feh flameshot xss-lock \
+		xorg-server xorg-xinit xorg-xrandr xorg-xhost \
+		xclip xdotool
+
+	# X11 portal & polkit
+	yes|sudo pacman -S --noconfirm --needed xdg-desktop-portal-gtk polkit-gnome
+
+	# AUR packages
+	yay --noconfirm --needed -S rofi-power-menu i3-battery-popup-git
 
 	# i3 config
 	[ ! -d ~/.config/i3 ] && mkdir -p ~/.config/i3
@@ -120,29 +222,122 @@ install-gui: sanity-check ## Install gui, i3, polybar, kitty, rofi, picom
 	[ -f ~/.config/polybar/launch.sh ] && [ ! -L ~/.config/polybar/launch.sh ] && mv ~/.config/polybar/launch.sh ~/.config/polybar/launch.sh.skabak
 	ln -sf /opt/skillarch/config/polybar/launch.sh ~/.config/polybar/launch.sh
 
-	# rofi config
-	[ ! -d ~/.config/rofi ] && mkdir -p ~/.config/rofi
-	[ -f ~/.config/rofi/config.rasi ] && [ ! -L ~/.config/rofi/config.rasi ] && mv ~/.config/rofi/config.rasi ~/.config/rofi/config.rasi.skabak
-	ln -sf /opt/skillarch/config/rofi/config.rasi ~/.config/rofi/config.rasi
-
 	# picom config
 	[ -f ~/.config/picom.conf ] && [ ! -L ~/.config/picom.conf ] && mv ~/.config/picom.conf ~/.config/picom.conf.skabak
 	ln -sf /opt/skillarch/config/picom.conf ~/.config/picom.conf
 
-	# kitty config
-	[ ! -d ~/.config/kitty ] && mkdir -p ~/.config/kitty
-	[ -f ~/.config/kitty/kitty.conf ] && [ ! -L ~/.config/kitty/kitty.conf ] && mv ~/.config/kitty/kitty.conf ~/.config/kitty/kitty.conf.skabak
-	ln -sf /opt/skillarch/config/kitty/kitty.conf ~/.config/kitty/kitty.conf
-
-	# touchpad config
+	# touchpad config (X11)
 	[ ! -d /etc/X11/xorg.conf.d ] && sudo mkdir -p /etc/X11/xorg.conf.d
 	[ -f /etc/X11/xorg.conf.d/30-touchpad.conf ] && sudo mv /etc/X11/xorg.conf.d/30-touchpad.conf /etc/X11/xorg.conf.d/30-touchpad.conf.skabak
 	sudo ln -sf /opt/skillarch/config/xorg.conf.d/30-touchpad.conf /etc/X11/xorg.conf.d/30-touchpad.conf
+
+	@echo "✅ i3-gaps (X11) installed!"
+	@echo "   WM: i3-gaps | Bar: Polybar | Compositor: Picom"
+	@echo "   Screenshots: Flameshot | Lock: i3lock-fancy"
 	make clean
+
+.PHONY: install-gui-hyprland
+install-gui-hyprland: sanity-check ## Install Hyprland compositor (Wayland)
+	[ ! -f /etc/machine-id ] && sudo systemd-machine-id-setup
+
+	# Hyprland compositor packages
+	yes|sudo pacman -S --noconfirm --needed \
+		hyprland hyprlock hypridle hyprpaper hyprpicker \
+		xdg-desktop-portal-hyprland
+
+	# Wayland status bar
+	yes|sudo pacman -S --noconfirm --needed waybar
+
+	# Wayland utilities
+	yes|sudo pacman -S --noconfirm --needed \
+		dunst grim slurp wl-clipboard clipse wlr-randr
+
+	# Wayland support for Qt apps
+	yes|sudo pacman -S --noconfirm --needed qt5-wayland qt6-wayland
+
+	# AUR packages
+	yay --noconfirm --needed -S hyprpolkitagent wlogout
+
+	# Create Hyprland config directories
+	mkdir -p ~/.config/hypr ~/.config/waybar ~/.config/waybar/scripts ~/.config/dunst ~/.config/clipse ~/.config/xdg-desktop-portal
+
+	# Determine which Hyprland config to use (Desktop vs VM)
+	@if [ "$(HYPR_MODE)" = "vm" ]; then \
+		echo "   Using Hyprland VM config (optimized, no animations/blur)"; \
+		[ -f ~/.config/hypr/hyprland.conf ] && [ ! -L ~/.config/hypr/hyprland.conf ] && mv ~/.config/hypr/hyprland.conf ~/.config/hypr/hyprland.conf.skabak; \
+		ln -sf /opt/skillarch/config/hypr/hyprland-vm.conf ~/.config/hypr/hyprland.conf; \
+	else \
+		echo "   Using Hyprland Desktop config (animations, blur, eye candy)"; \
+		[ -f ~/.config/hypr/hyprland.conf ] && [ ! -L ~/.config/hypr/hyprland.conf ] && mv ~/.config/hypr/hyprland.conf ~/.config/hypr/hyprland.conf.skabak; \
+		ln -sf /opt/skillarch/config/hypr/hyprland.conf ~/.config/hypr/hyprland.conf; \
+	fi
+
+	# hyprpaper config
+	[ -f ~/.config/hypr/hyprpaper.conf ] && [ ! -L ~/.config/hypr/hyprpaper.conf ] && mv ~/.config/hypr/hyprpaper.conf ~/.config/hypr/hyprpaper.conf.skabak
+	ln -sf /opt/skillarch/config/hypr/hyprpaper.conf ~/.config/hypr/hyprpaper.conf
+
+	# hyprlock config
+	[ -f ~/.config/hypr/hyprlock.conf ] && [ ! -L ~/.config/hypr/hyprlock.conf ] && mv ~/.config/hypr/hyprlock.conf ~/.config/hypr/hyprlock.conf.skabak
+	ln -sf /opt/skillarch/config/hypr/hyprlock.conf ~/.config/hypr/hyprlock.conf
+
+	# hypridle config
+	[ -f ~/.config/hypr/hypridle.conf ] && [ ! -L ~/.config/hypr/hypridle.conf ] && mv ~/.config/hypr/hypridle.conf ~/.config/hypr/hypridle.conf.skabak
+	ln -sf /opt/skillarch/config/hypr/hypridle.conf ~/.config/hypr/hypridle.conf
+
+	# waybar config
+	[ -f ~/.config/waybar/config.jsonc ] && [ ! -L ~/.config/waybar/config.jsonc ] && mv ~/.config/waybar/config.jsonc ~/.config/waybar/config.jsonc.skabak
+	ln -sf /opt/skillarch/config/hypr/waybar/config.jsonc ~/.config/waybar/config.jsonc
+	[ -f ~/.config/waybar/style.css ] && [ ! -L ~/.config/waybar/style.css ] && mv ~/.config/waybar/style.css ~/.config/waybar/style.css.skabak
+	ln -sf /opt/skillarch/config/hypr/waybar/style.css ~/.config/waybar/style.css
+
+	# waybar scripts
+	for script in bluetooth-status.sh display-swap.sh display-toggle.sh vpn-status.sh vpn-toggle.sh; do \
+		[ -f ~/.config/waybar/scripts/$$script ] && [ ! -L ~/.config/waybar/scripts/$$script ] && mv ~/.config/waybar/scripts/$$script ~/.config/waybar/scripts/$$script.skabak; \
+		ln -sf /opt/skillarch/config/hypr/waybar/scripts/$$script ~/.config/waybar/scripts/$$script; \
+	done
+
+	# dunst config
+	[ -f ~/.config/dunst/dunstrc ] && [ ! -L ~/.config/dunst/dunstrc ] && mv ~/.config/dunst/dunstrc ~/.config/dunst/dunstrc.skabak
+	ln -sf /opt/skillarch/config/hypr/dunst/dunstrc ~/.config/dunst/dunstrc
+
+	# clipse configs
+	[ -f ~/.config/clipse/config.json ] && [ ! -L ~/.config/clipse/config.json ] && mv ~/.config/clipse/config.json ~/.config/clipse/config.json.skabak
+	ln -sf /opt/skillarch/config/hypr/clipse/config.json ~/.config/clipse/config.json
+	[ -f ~/.config/clipse/custom_theme.json ] && [ ! -L ~/.config/clipse/custom_theme.json ] && mv ~/.config/clipse/custom_theme.json ~/.config/clipse/custom_theme.json.skabak
+	ln -sf /opt/skillarch/config/hypr/clipse/custom_theme.json ~/.config/clipse/custom_theme.json
+
+	# xdg-desktop-portal configs
+	[ -f ~/.config/xdg-desktop-portal/hyprland.portals ] && [ ! -L ~/.config/xdg-desktop-portal/hyprland.portals ] && mv ~/.config/xdg-desktop-portal/hyprland.portals ~/.config/xdg-desktop-portal/hyprland.portals.skabak
+	ln -sf /opt/skillarch/config/hypr/xdg-desktop-portal/hyprland.portals ~/.config/xdg-desktop-portal/hyprland.portals
+	[ -f ~/.config/xdg-desktop-portal/portals.conf ] && [ ! -L ~/.config/xdg-desktop-portal/portals.conf ] && mv ~/.config/xdg-desktop-portal/portals.conf ~/.config/xdg-desktop-portal/portals.conf.skabak
+	ln -sf /opt/skillarch/config/hypr/xdg-desktop-portal/portals.conf ~/.config/xdg-desktop-portal/portals.conf
+
+	@echo "✅ Hyprland (Wayland) installed!"
+	@echo "   Compositor: Hyprland | Bar: Waybar"
+	@echo "   Screenshots: Grim+Slurp | Lock: Hyprlock | Idle: Hypridle"
+	@if [ "$(HYPR_MODE)" = "vm" ]; then \
+		echo "   Mode: VM (optimized for VirtualBox/VMware)"; \
+	else \
+		echo "   Mode: Desktop (animations, blur, effects)"; \
+	fi
+	make clean
+
+.PHONY: install-gui
+install-gui: sanity-check validate-wm-choice install-gui-common ## Install GUI environment (conditional based on WM choice)
+	@echo "════════════════════════════════════════════════════════"
+	@echo "  Installing GUI based on your choice: $(WM_CHOICE)"
+	@echo "════════════════════════════════════════════════════════"
+	@if [ "$(WM_CHOICE)" = "i3" ]; then \
+		$(MAKE) install-gui-i3; \
+	elif [ "$(WM_CHOICE)" = "hyprland" ]; then \
+		$(MAKE) install-gui-hyprland; \
+	fi
+	@echo ""
+	@echo "✅ GUI installation complete!"
 
 install-gui-tools: sanity-check ## Install system packages
 	yes|sudo pacman -S --noconfirm --needed vlc-luajit # Must be done before obs-studio-browser to avoid conflicts
-	yes|sudo pacman -S --noconfirm --needed arandr blueman cheese code code-marketplace discord dunst filezilla flameshot ghex google-chrome gparted kompare libreoffice-fresh meld obsidian okular qbittorrent torbrowser-launcher wireshark-qt ghidra signal-desktop dragon-drop-git nomachine obs-studio-browser emote guvcview audacity polkit-gnome
+	yes|sudo pacman -S --noconfirm --needed arandr cheese code code-marketplace discord dunst filezilla flameshot ghex google-chrome gparted kompare libreoffice-fresh meld obsidian okular qbittorrent torbrowser-launcher wireshark-qt ghidra signal-desktop dragon-drop-git nomachine obs-studio-browser emote guvcview audacity polkit-gnome
 	yay --noconfirm --needed -S zen-browser-bin
 	# Do not start services in docker
 	[ ! -f /.dockerenv ] && sudo systemctl disable --now nxserver.service
@@ -200,55 +395,6 @@ install-hardening: sanity-check ## Install hardening tools
 	# sudo systemctl enable --now opensnitchd.service
 	make clean
 
-install-hyprland: sanity-check ## Install Hyprland alongside GNOME (removes i3)
-	# Remove i3 ecosystem (cleanup for GNOME + Hyprland coexistence)
-	sudo pacman -Rns --noconfirm i3-gaps i3blocks i3lock i3lock-fancy-git i3status polybar picom feh arandr xorg-xhost thunar || true
-	yay -Rns --noconfirm rofi-power-menu i3-battery-popup-git || true
-	
-	# Install Hyprland ecosystem - GNOME Compatible
-	yes|sudo pacman -S --noconfirm --needed hyprland xdg-desktop-portal-hyprland \
-		hyprpaper hyprlock hypridle hyprpicker waybar rofi dunst grim slurp \
-		wl-clipboard qt5-wayland qt6-wayland wlr-randr brightnessctl
-	
-	# Ensure GNOME apps are available (may already be installed)
-	yes|sudo pacman -S --noconfirm --needed nautilus gnome-control-center
-	
-	# Install AUR packages
-	yay --noconfirm --needed -S hyprpolkitagent wlogout
-	
-	# Remove old i3 configs
-	rm -rf ~/.config/i3 ~/.config/polybar ~/.config/picom.conf || true
-	sudo rm -rf /etc/X11/xorg.conf.d/30-touchpad.conf || true
-	
-	# Create Hyprland config directories
-	mkdir -p ~/.config/hypr ~/.config/waybar ~/.config/dunst
-	
-	# Link Hyprland configs
-	[ -f ~/.config/hypr/hyprland.conf ] && [ ! -L ~/.config/hypr/hyprland.conf ] && mv ~/.config/hypr/hyprland.conf ~/.config/hypr/hyprland.conf.skabak
-	ln -sf /opt/skillarch/config/hypr/hyprland.conf ~/.config/hypr/hyprland.conf
-	
-	[ -f ~/.config/hypr/hyprpaper.conf ] && [ ! -L ~/.config/hypr/hyprpaper.conf ] && mv ~/.config/hypr/hyprpaper.conf ~/.config/hypr/hyprpaper.conf.skabak
-	ln -sf /opt/skillarch/config/hypr/hyprpaper.conf ~/.config/hypr/hyprpaper.conf
-	
-	[ -f ~/.config/hypr/hyprlock.conf ] && [ ! -L ~/.config/hypr/hyprlock.conf ] && mv ~/.config/hypr/hyprlock.conf ~/.config/hypr/hyprlock.conf.skabak
-	ln -sf /opt/skillarch/config/hypr/hyprlock.conf ~/.config/hypr/hyprlock.conf
-	
-	# Link Waybar configs
-	[ -f ~/.config/waybar/config.jsonc ] && [ ! -L ~/.config/waybar/config.jsonc ] && mv ~/.config/waybar/config.jsonc ~/.config/waybar/config.jsonc.skabak
-	ln -sf /opt/skillarch/config/waybar/config.jsonc ~/.config/waybar/config.jsonc
-	
-	[ -f ~/.config/waybar/style.css ] && [ ! -L ~/.config/waybar/style.css ] && mv ~/.config/waybar/style.css ~/.config/waybar/style.css.skabak
-	ln -sf /opt/skillarch/config/waybar/style.css ~/.config/waybar/style.css
-	
-	# Link Dunst config
-	[ -f ~/.config/dunst/dunstrc ] && [ ! -L ~/.config/dunst/dunstrc ] && mv ~/.config/dunst/dunstrc ~/.config/dunst/dunstrc.skabak
-	ln -sf /opt/skillarch/config/dunst/dunstrc ~/.config/dunst/dunstrc
-	
-	@echo "🎉 Hyprland installed! You can now choose 'Hyprland' at login screen."
-	@echo "🏠 GNOME session remains available as fallback."
-	@echo "📁 File manager: nautilus | Settings: gnome-control-center"
-	make clean
-
 update: sanity-check ## Update SkillArch
 	@[ -n "$$(git status --porcelain)" ] && echo "Error: git state is dirty, please "git stash" your changes before updating" && exit 1
 	@[ "$$(git rev-parse --abbrev-ref HEAD)" != "main" ] && echo "Error: current branch is not main, please switch to main before updating" && exit 1
@@ -261,12 +407,26 @@ docker-build:  ## Build lite docker image locally
 docker-build-full: docker-build  ## Build full docker image locally
 	docker build -t thelaluka/skillarch:full -f Dockerfile-full .
 
+docker-build-full-i3: docker-build  ## Build full i3 docker image locally
+	docker build -t thelaluka/skillarch:full-i3 -f Dockerfile-full-i3 .
+
+docker-build-full-hyprland: docker-build  ## Build full Hyprland docker image locally
+	docker build -t thelaluka/skillarch:full-hyprland -f Dockerfile-full-hyprland .
+
 docker-run:  ## Run lite docker image locally
 	sudo docker run --rm -it --name=ska --net=host -v /tmp:/tmp thelaluka/skillarch:lite
 
 docker-run-full:  ## Run full docker image locally
 	xhost +
 	sudo docker run --rm -it --name=ska --net=host -v /tmp:/tmp -e DISPLAY -v /tmp/.X11-unix/:/tmp/.X11-unix/ --privileged thelaluka/skillarch:full
+
+docker-run-full-i3:  ## Run full i3 docker image locally
+	xhost +
+	sudo docker run --rm -it --name=ska-i3 --net=host -v /tmp:/tmp -e DISPLAY -v /tmp/.X11-unix/:/tmp/.X11-unix/ --privileged thelaluka/skillarch:full-i3
+
+docker-run-full-hyprland:  ## Run full Hyprland docker image locally
+	xhost +
+	sudo docker run --rm -it --name=ska-hyprland --net=host -v /tmp:/tmp -e DISPLAY -e XDG_RUNTIME_DIR -e WAYLAND_DISPLAY -v /run/user/$$(id -u):/run/user/$$(id -u) --privileged thelaluka/skillarch:full-hyprland
 
 clean: ## Clean up system and remove unnecessary files
 	[ ! -f /.dockerenv ] && exit

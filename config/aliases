@@ -1,7 +1,45 @@
 # Skillarch Helpers
 alias ska='/opt/skillarch'
 alias skao='/opt/skillarch-original'
-alias ska-help-bindings='i3-msg -t get_config | grep -vF "#bindsym" | grep -oP "bindsym .*" | fzf'
+alias ska-help-bindings='(
+    if pgrep -x "Hyprland" &>/dev/null && command -v hyprctl &>/dev/null; then
+        echo "🔍 Détection: Environnement Hyprland actif"
+        if [[ -t 1 ]] && command -v fzf &>/dev/null; then
+            hyprctl binds | awk "BEGIN{print \"Modifier\tKey\tAction\"} /^bind/{getline mod; getline submap; getline key; getline keycode; getline catchall; getline desc; getline disp; getline arg; gsub(/\t/, \"\", mod); gsub(/\t/, \"\", key); gsub(/\t/, \"\", disp); gsub(/\t/, \"\", arg); if(key!=\"\") printf \"%-12s\t%-15s\t%s %s\\n\", mod, key, disp, arg}" | fzf --header="🎹 Hyprland Key Bindings" --header-lines=1
+        else
+            echo "📋 Raccourcis Hyprland disponibles:"
+            hyprctl binds | awk "/^bind/{getline mod; getline submap; getline key; getline keycode; getline catchall; getline desc; getline disp; getline arg; gsub(/\t/, \"\", mod); gsub(/\t/, \"\", key); gsub(/\t/, \"\", disp); gsub(/\t/, \"\", arg); if(key!=\"\") printf \"  %-12s + %-15s → %s %s\\n\", mod, key, disp, arg}" | head -20
+            echo "  ... ($(hyprctl binds | grep -c \"^bind\") bindings total)"
+        fi
+    elif pgrep -x "i3" &>/dev/null && command -v i3-msg &>/dev/null && i3-msg -t get_config &>/dev/null; then
+        echo "🔍 Détection: Environnement i3 actif"
+        if [[ -t 1 ]] && command -v fzf &>/dev/null; then
+            i3-msg -t get_config | grep -vF "#bindsym" | grep -oP "bindsym .*" | fzf --header="🎹 i3 Key Bindings"
+        else
+            echo "📋 Raccourcis i3 disponibles:"
+            i3-msg -t get_config | grep -vF "#bindsym" | grep -oP "bindsym .*" | head -20
+        fi
+    else
+        echo "🔍 Session: ${XDG_CURRENT_DESKTOP:-Inconnu} (${XDG_SESSION_TYPE:-Inconnu})"
+        echo "ℹ️  Gestionnaire de fenêtres non détecté ou non accessible"
+        echo "📋 Raccourcis depuis les fichiers de config:"
+        if [[ -f /opt/skillarch/config/hypr/hyprland.conf ]]; then
+            echo "  Hyprland: $(grep -c "^bind" /opt/skillarch/config/hypr/hyprland.conf) bindings"
+            if [[ -t 1 ]] && command -v fzf &>/dev/null; then
+                echo "Tapez [h] pour Hyprland, [i] pour i3, ou [Entrée] pour quitter:"
+                read -r choice
+                case $choice in
+                    h) grep "^bind" /opt/skillarch/config/hypr/hyprland.conf | fzf --header="🎹 Hyprland Key Bindings (config file)" ;;
+                    i) grep "^bindsym" /opt/skillarch/config/i3/config | fzf --header="🎹 i3 Key Bindings (config file)" ;;
+                    *) echo "Annulé." ;;
+                esac
+            fi
+        fi
+        if [[ -f /opt/skillarch/config/i3/config ]]; then
+            echo "  i3: $(grep -c "^bindsym" /opt/skillarch/config/i3/config) bindings"
+        fi
+    fi
+) 2>/dev/null'
 alias ska-help-aliases='alias | fzf'
 alias ska-help-packages='pacman -Q | fzf'
 alias ska-update-simple='ska && make update && make install'
@@ -9,6 +47,7 @@ alias ska-update-advanced='echo "# SAVE your changes on your repo" ; echo "git a
 alias ska-vbox-install-guestutils='sudo pacman -S virtualbox-guest-utils'
 alias ska-vbox-install='sudo pacman -S virtualbox virtualbox-host-dkms && echo -e "\n\n\nNow reboot to load the vbox drivers"'
 alias ska-sudo-unlock='su -c "faillock --user $USER --reset"'
+alias ska-test='echo "🧪 Test SkillArch (ska-*)" && echo "Session: ${XDG_CURRENT_DESKTOP:-?} (${XDG_SESSION_TYPE:-?})" && echo "WM: $(pgrep -x Hyprland &>/dev/null && echo Hyprland || pgrep -x i3 &>/dev/null && echo i3 || echo Aucun)" && echo "Commandes ska-*:" && alias | grep "^ska-" | wc -l && echo "💡 ska-help-bindings disponible"'
 alias fastfetch='/usr/bin/fastfetch --logo /opt/skillarch/assets/logo-round-hot.png --logo-width 50'
 alias neofetch='fastfetch'
 alias hifetch='fastfetch'
@@ -66,7 +105,8 @@ alias get-ip-cpy='curl -sS ipinfo.io/ip | cpy'
 # Video, Audio
 alias webcam-guvcview='guvcview'
 alias yt-dlp-likes='yt-dlp --cookies www.youtube.com_cookies.txt -x --audio-format mp3  :ytfav' # https://chromewebstore.google.com/detail/get-cookiestxt-locally/cclelndahbckbenkjhflpdbgdldlbecc
-alias flameshotz='while true; do flameshot full -p ~/Downloads; sleep 1; done'
+# X11-specific alias (loaded conditionally at end of file)
+# alias flameshotz='while true; do flameshot full -p ~/Downloads; sleep 1; done'
 
 # Monitoring, Upload, Sleep
 alias show-disk-io='watch -cd -- iostat -h'
@@ -74,7 +114,8 @@ alias sdi='show-disk-io'
 alias show-open-ports="sudo ss -latepun | grep -i listen"
 alias sop='show-open-ports'
 alias get-du='du -ch -d 1'
-alias get-pid-click='xprop _NET_WM_PID | cut -d" " -f3'
+# X11-specific alias (loaded conditionally at end of file)
+# alias get-pid-click='xprop _NET_WM_PID | cut -d" " -f3'
 alias get-pid-ps='ps fauxw | fzf | awk "{ print \$2}"'
 alias get-shell-size='echo "stty rows $LINES cols $COLUMNS"'
 alias dirmon='inotifywait -rm -e create -e moved_to -e modify -e access -e attrib -e close_write -e moved_from'
@@ -94,12 +135,14 @@ alias sortn='sort -V | uniq -c | sort -n'
 alias grephilight='export GREP_COLORS="mt=30;46"'
 alias cheat='f(){ curl -s "cheat.sh/$1";  unset -f f; }; f'
 alias clean-swap='sudo swapoff -a && sudo swapon -a'
-alias cpy='xclip -selection clipboard'
-alias paste='xclip -selection clipboard -o'
-alias mcrypt-enc='f(){ PASS=$(cat /dev/urandom | base64 | head -c 20) && echo "$PASS" | xclip -selection c && tar -zcvf "$1.tar.gz" "$1" && echo "$PASS" && mcrypt "$1.tar.gz" && echo "$1.tar.gz $PASS" | xclip -selection c;  unset -f f; }; f'
+# X11-specific aliases (loaded conditionally at end of file)
+# alias cpy='xclip -selection clipboard'
+# alias paste='xclip -selection clipboard -o'
+# alias mcrypt-enc='f(){ PASS=$(cat /dev/urandom | base64 | head -c 20) && echo "$PASS" | xclip -selection c && tar -zcvf "$1.tar.gz" "$1" && echo "$PASS" && mcrypt "$1.tar.gz" && echo "$1.tar.gz $PASS" | xclip -selection c;  unset -f f; }; f'
 alias mcrypt-dec='mdecrypt'
 alias get-meteo='curl https://wttr.in/'
 alias fab='fabric-ai -s'
+alias hyprpicker='hyprpicker -a'
 
 # Python
 alias pv='f(){ if [ -z "$1" ] ; then echo "Use: pv 3.12" ; else mise use "python@$1" ; mise config set env._.python.venv.path .venv ; mise config set --type list env._.python.venv.uv_create_args -- --seed ; mise config set --type bool env._.python.venv.create true ; mise exec -- which python ; mise exec -- python --version ; fi;  unset -f f; }; f'
@@ -196,3 +239,39 @@ alias dsysdig='dockit --privileged -v /var/run/docker.sock:/host/var/run/docker.
 alias dswagger-editor='dockit -p 127.0.0.1:8000:8080 docker.swagger.io/swaggerapi/swagger-editor'
 alias dcarbonyl='dockit fathyb/carbonyl' # Chrome in Terminal
 alias dphp7='dockit php:7.4' # Arch suffers from "too new libraries" making it hard to build
+
+# Hyprland Ecosystem Helpers
+alias ska-hypr='/opt/skillarch/scripts/ska-hypr-helper'
+alias ska-hypr-info='ska-hypr info'
+alias ska-hypr-reload='ska-hypr reload'
+alias ska-hypr-restart='ska-hypr restart'
+alias ska-hypr-monitors='ska-hypr monitors'
+alias ska-hypr-windows='ska-hypr windows'
+alias ska-hypr-toggle-anim='ska-hypr toggle-anim'
+alias ska-hypr-toggle-blur='ska-hypr toggle-blur'
+alias ska-hypr-perf='ska-hypr performance'
+alias ska-hypr-beauty='ska-hypr beauty'
+alias ska-hypr-nightlight='ska-hypr night-light'
+alias ska-hypr-lock='ska-hypr lock'
+alias ska-hypr-wallpaper='ska-hypr wallpaper'
+alias ska-wm-info='/opt/skillarch/scripts/ska-wm-info'
+
+# ═══════════════════════════════════════════════════════════════════════════
+# WM-Specific Aliases (X11 vs Wayland)
+# ═══════════════════════════════════════════════════════════════════════════
+
+if [[ "$XDG_SESSION_TYPE" == "x11" ]] || command -v xclip &>/dev/null; then
+    # X11-specific aliases (i3-gaps environment)
+    alias cpy='xclip -selection clipboard'
+    alias paste='xclip -selection clipboard -o'
+    alias get-pid-click='xprop _NET_WM_PID | cut -d" " -f3'
+    alias flameshotz='while true; do flameshot full -p ~/Downloads; sleep 1; done'
+    alias mcrypt-enc='f(){ PASS=$(cat /dev/urandom | base64 | head -c 20) && echo "$PASS" | xclip -selection c && tar -zcvf "$1.tar.gz" "$1" && echo "$PASS" && mcrypt "$1.tar.gz" && echo "$1.tar.gz $PASS" | xclip -selection c;  unset -f f; }; f'
+elif [[ "$XDG_SESSION_TYPE" == "wayland" ]] || command -v wl-copy &>/dev/null; then
+    # Wayland-specific aliases (Hyprland environment)
+    alias cpy='wl-copy'
+    alias paste='wl-paste'
+    alias get-pid-click='hyprctl activewindow | grep "pid:" | awk "{print \$2}"'
+    alias flameshotz='echo "❌ flameshotz not available in Wayland. Use: grim -g \"\$(slurp)\" screenshot.png"'
+    alias mcrypt-enc='f(){ PASS=$(cat /dev/urandom | base64 | head -c 20) && echo "$PASS" | wl-copy && tar -zcvf "$1.tar.gz" "$1" && echo "$PASS" && mcrypt "$1.tar.gz" && echo "$1.tar.gz $PASS" | wl-copy;  unset -f f; }; f'
+fi

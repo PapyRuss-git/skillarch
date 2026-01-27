@@ -23,7 +23,7 @@ font pango:monospace 8
 # Start XDG autostart .desktop files using dex. See also
 # https://wiki.archlinux.org/index.php/XDG_Autostart
 exec_always --no-startup-id dex --autostart --environment i3
-exec_always --no-startup-id feh --bg-scale /opt/skillarch/assets/bg.jpg
+exec_always --no-startup-id feh --bg-scale /opt/skillarch/assets/everforest-bg.jpg
 exec_always --no-startup-id ~/.config/polybar/launch.sh &> /var/tmp/polybar.log
 exec_always --no-startup-id pgrep --exact VBoxService &> /dev/null && killall VBoxClient ; VBoxClient-all
 exec_always --no-startup-id bash -c "killall -q picom ; grep -qF hypervisor /proc/cpuinfo || picom"
@@ -180,7 +180,7 @@ bindsym $mod+Shift+p exec flameshot full -p ~/Pictures/
 bindsym $mod+s exec pavucontrol
 bindsym $mod+shift+s exec XDG_CURRENT_DESKTOP=GNOME gnome-control-center
 bindsym $mod+e exec emote
-bindsym $mod+b exec blueman-manager
+bindsym $mod+b exec XDG_CURRENT_DESKTOP=GNOME gnome-control-center bluetooth
 bindsym $mod+w exec XDG_CURRENT_DESKTOP=GNOME gnome-control-center wifi
 bindsym $mod+n exec nautilus
 bindsym $mod+v exec vlc
@@ -192,15 +192,16 @@ bindsym $mod+m exec pactl set-source-mute @DEFAULT_SOURCE@ toggle
 bindsym $mod+Escape exec rofi -show power-menu -modi "power-menu:rofi-power-menu --choices shutdown/reboot/logout/suspend"
 bindsym $mod+l exec i3lock-fancy -f Bitstream-Vera-Serif -t 'Welcome back to SkillArch'
 
-# Window Colors
+# Window Colors - EverForest Theme
 default_border pixel 2
 default_floating_border pixel 2
 
-client.focused          #000000 #000000 #000000 #aa00ee   #660066
-client.unfocused        #000000 #000000 #000000 #000000   #000000
-client.focused_inactive #000000 #000000 #000000 #000000   #000000
-client.unfocused_inactive #000000 #000000 #000000 #000000   #000000
-client.urgent           #000000 #000000 #000000 #000000   #000000
+# EverForest colors: bg_dim #1E2326, green #A7C080, aqua #83C092, red #E67E80
+client.focused          #A7C080 #272E33 #D3C6AA #83C092   #A7C080
+client.unfocused        #1E2326 #1E2326 #5C6A72 #1E2326   #1E2326
+client.focused_inactive #272E33 #272E33 #859289 #272E33   #272E33
+client.unfocused_inactive #1E2326 #1E2326 #5C6A72 #1E2326   #1E2326
+client.urgent           #E67E80 #E67E80 #D3C6AA #E67E80   #E67E80
 
 # Make help windows float by default
 for_window [title="^Help: SkillArch Bindings$"] floating enable
