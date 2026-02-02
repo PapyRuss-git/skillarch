@@ -49,6 +49,7 @@
         "format": "{}",
         "exec": "~/.config/waybar/scripts/backlight-status.sh",
         "interval": 2,
+        "signal": 8,
         "tooltip": true,
         "on-click": "pkill -x hyprsunset || hyprsunset >/dev/null 2>&1 &",
         "on-scroll-up": "brightnessctl set 5%+",
