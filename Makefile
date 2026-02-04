@@ -161,6 +161,15 @@ install-gui-common: sanity-check ## Install common GUI packages (X11 + Wayland c
 	# Common audio & brightness
 	yes|sudo pacman -S --noconfirm --needed pavucontrol brightnessctl
 
+	# DDC/CI driver for external monitor brightness control (KDE-like behavior)
+	# After reboot, brightnessctl will control ALL monitors (laptop + external) simultaneously
+	yay --noconfirm --needed -S ddcci-driver-linux-dkms
+	echo "ddcci" | sudo tee /etc/modules-load.d/ddcci.conf
+	sudo modprobe ddcci || true
+	# Ensure i2c group exists for DDC/CI access
+	getent group i2c > /dev/null || sudo groupadd i2c
+	sudo usermod -aG i2c "$$USER" || true
+
 	# Common file manager & utilities
 	yes|sudo pacman -S --noconfirm --needed nautilus file-roller arandr
 
