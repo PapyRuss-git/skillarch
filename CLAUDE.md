@@ -25,6 +25,7 @@ SkillArch is a Linux penetration testing and cybersecurity distribution built on
 - `make install-shell` - Install zsh, oh-my-zsh, and shell configuration
 - `make install-docker` - Install and configure Docker
 - `make install-gui` - Install i3, polybar, kitty, rofi, and GUI components
+- `make install-eww` - Install eww bar (alternative to Waybar for Hyprland)
 - `make install-gui-tools` - Install GUI applications
 - `make install-offensive` - Install penetration testing tools
 - `make install-wordlists` - Install security wordlists
@@ -46,6 +47,10 @@ SkillArch is a Linux penetration testing and cybersecurity distribution built on
 - `ska-help-packages` - Fuzzy search through installed packages
 - `ska-sudo-unlock` - Unlock user after failed sudo attempts
 - `ska-wm-info` - Display current window manager info (planned)
+- `ska-bar-waybar` - Switch to Waybar (Hyprland)
+- `ska-bar-eww` - Switch to eww bar (Hyprland)
+- `ska-bar-toggle` - Toggle between Waybar and eww
+- `ska-bar-info` - Show current bar choice
 
 ## Architecture and Structure
 
@@ -92,6 +97,8 @@ Centralized configuration with atomic symlink operations from `/opt/skillarch/co
 - `config/hypr/hypridle.conf` → `~/.config/hypr/hypridle.conf`
 - `config/hypr/hyprpaper.conf` → `~/.config/hypr/hyprpaper.conf`
 - `config/hypr/waybar/` → `~/.config/waybar/`
+- `config/hypr/eww/` → `~/.config/eww/` (alternative bar, install via `make install-eww`)
+- `config/hypr/scripts/` → `~/.config/hypr/scripts/` (bar launcher, etc.)
 - `config/hypr/dunst/` → `~/.config/dunst/`
 - `config/hypr/clipse/` → `~/.config/clipse/`
 - `config/hypr/xdg-desktop-portal/` → `~/.config/xdg-desktop-portal/`
@@ -157,7 +164,7 @@ SkillArch supports two distinct window manager setups. Currently both are instal
 **Hyprland (Wayland Stack)**
 - **Terminal**: Kitty with Everforest theme
 - **Compositor**: Hyprland with GNOME coexistence
-- **Status Bar**: Waybar
+- **Status Bar**: Waybar (default) or eww (alternative, install via `make install-eww`)
 - **Launcher**: Rofi (Wayland mode)
 - **Notifications**: Dunst
 - **Background**: Hyprpaper
@@ -165,6 +172,7 @@ SkillArch supports two distinct window manager setups. Currently both are instal
 - **Lock Screen**: Hyprlock
 - **Clipboard**: wl-clipboard + Clipse
 - **Idle Management**: Hypridle
+- **Bar Switching**: `ska-bar-toggle` to switch between Waybar and eww
 
 **Common Components** (Both Environments)
 - **File Manager**: Nautilus (GNOME)

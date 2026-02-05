@@ -256,6 +256,12 @@ alias ska-hypr-lock='ska-hypr lock'
 alias ska-hypr-wallpaper='ska-hypr wallpaper'
 alias ska-wm-info='/opt/skillarch/scripts/ska-wm-info'
 
+# Bar switching (Hyprland: Waybar <-> eww)
+alias ska-bar-waybar='killall eww 2>/dev/null; waybar & echo "waybar" > ~/.config/skillarch/bar-choice; echo "✅ Switched to Waybar"'
+alias ska-bar-eww='killall waybar 2>/dev/null; eww daemon 2>/dev/null; sleep 0.3; eww open bar; echo "eww" > ~/.config/skillarch/bar-choice; echo "✅ Switched to eww"'
+alias ska-bar-toggle='[[ "$(cat ~/.config/skillarch/bar-choice 2>/dev/null)" == "eww" ]] && ska-bar-waybar || ska-bar-eww'
+alias ska-bar-info='echo "Current bar: $(cat ~/.config/skillarch/bar-choice 2>/dev/null || echo waybar)"'
+
 # ═══════════════════════════════════════════════════════════════════════════
 # WM-Specific Aliases (X11 vs Wayland)
 # ═══════════════════════════════════════════════════════════════════════════

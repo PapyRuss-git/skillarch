@@ -1,0 +1,48 @@
+; eww.yuck - "Activate Linux" watermark for SkillArch
+; Shows on empty workspaces only, on all monitors
+; Inspired by https://github.com/Nycta-b424b3c7/eww_activate-linux
+
+(defwidget activate-linux []
+  (box
+    :class "activate-linux"
+    :orientation "v"
+    :halign "start"
+    :valign "start"
+    (label :xalign 0 :markup "<span font_size=\"large\">Activate Linux</span>")
+    (label :xalign 0 :text "Go to Settings to activate Linux")))
+
+; Window for monitor 0
+(defwindow activate-linux-0
+  :monitor 0
+  :stacking "bottom"
+  :exclusive false
+  :focusable false
+  :geometry (geometry :x "16px" :y "48px" :width "280px" :anchor "bottom right")
+  (activate-linux))
+
+; Window for monitor 1
+(defwindow activate-linux-1
+  :monitor 1
+  :stacking "bottom"
+  :exclusive false
+  :focusable false
+  :geometry (geometry :x "16px" :y "48px" :width "280px" :anchor "bottom right")
+  (activate-linux))
+
+; Window for monitor 2
+(defwindow activate-linux-2
+  :monitor 2
+  :stacking "bottom"
+  :exclusive false
+  :focusable false
+  :geometry (geometry :x "16px" :y "48px" :width "280px" :anchor "bottom right")
+  (activate-linux))
+
+; Window for monitor 3
+(defwindow activate-linux-3
+  :monitor 3
+  :stacking "bottom"
+  :exclusive false
+  :focusable false
+  :geometry (geometry :x "16px" :y "48px" :width "280px" :anchor "bottom right")
+  (activate-linux))

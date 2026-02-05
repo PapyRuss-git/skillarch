@@ -1,0 +1,15 @@
+/* eww.scss - "Activate Linux" watermark style */
+/* Inspired by https://github.com/Nycta-b424b3c7/eww_activate-linux */
+
+* {
+    all: unset;
+    font-family: "JetBrains Mono Nerd Font", "Ubuntu Nerd Font", sans-serif;
+}
+
+window {
+    background: transparent;
+}
+
+.activate-linux {
+    color: rgba(250, 250, 250, 0.35);
+}

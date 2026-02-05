@@ -342,6 +342,33 @@ install-gui-hyprland: sanity-check ## Install Hyprland compositor (Wayland)
 	fi
 	make clean
 
+.PHONY: install-eww
+install-eww: sanity-check ## Install eww "Activate Linux" watermark (Hyprland only)
+	@echo "════════════════════════════════════════════════════════"
+	@echo "  Installing eww - Activate Linux watermark"
+	@echo "════════════════════════════════════════════════════════"
+	yay --noconfirm --needed -S eww
+
+	# Create eww config directory
+	mkdir -p ~/.config/eww
+
+	# Backup existing configs if they exist and are not symlinks
+	[ -f ~/.config/eww/eww.yuck ] && [ ! -L ~/.config/eww/eww.yuck ] && mv ~/.config/eww/eww.yuck ~/.config/eww/eww.yuck.skabak || true
+	[ -f ~/.config/eww/eww.scss ] && [ ! -L ~/.config/eww/eww.scss ] && mv ~/.config/eww/eww.scss ~/.config/eww/eww.scss.skabak || true
+	[ -d ~/.config/eww/scripts ] && [ ! -L ~/.config/eww/scripts ] && mv ~/.config/eww/scripts ~/.config/eww/scripts.skabak || true
+
+	# Create symlinks
+	ln -sf /opt/skillarch/config/hypr/eww/eww.yuck ~/.config/eww/eww.yuck
+	ln -sf /opt/skillarch/config/hypr/eww/eww.scss ~/.config/eww/eww.scss
+	ln -sfn /opt/skillarch/config/hypr/eww/scripts ~/.config/eww/scripts
+	chmod +x /opt/skillarch/config/hypr/eww/scripts/*.sh
+
+	@echo ""
+	@echo "✅ eww installed!"
+	@echo "   Watermark auto-starts with Hyprland (exec-once configured)"
+	@echo "   Manual: ~/.config/eww/scripts/activate-linux.sh"
+	@echo "   Stop:   eww close-all && eww kill"
+
 .PHONY: install-gui
 install-gui: sanity-check validate-wm-choice install-gui-common ## Install GUI environment (conditional based on WM choice)
 	@echo "════════════════════════════════════════════════════════"
