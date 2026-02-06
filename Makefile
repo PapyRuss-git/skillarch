@@ -332,6 +332,12 @@ install-gui-hyprland: sanity-check ## Install Hyprland compositor (Wayland)
 	[ -f ~/.config/xdg-desktop-portal/portals.conf ] && [ ! -L ~/.config/xdg-desktop-portal/portals.conf ] && mv ~/.config/xdg-desktop-portal/portals.conf ~/.config/xdg-desktop-portal/portals.conf.skabak
 	ln -sf /opt/skillarch/config/hypr/xdg-desktop-portal/portals.conf ~/.config/xdg-desktop-portal/portals.conf
 
+	# start-bar.sh script
+	mkdir -p ~/.config/hypr/scripts
+	[ -f ~/.config/hypr/scripts/start-bar.sh ] && [ ! -L ~/.config/hypr/scripts/start-bar.sh ] && mv ~/.config/hypr/scripts/start-bar.sh ~/.config/hypr/scripts/start-bar.sh.skabak || true
+	ln -sf /opt/skillarch/config/hypr/scripts/start-bar.sh ~/.config/hypr/scripts/start-bar.sh
+	chmod +x /opt/skillarch/config/hypr/scripts/start-bar.sh
+
 	@echo "✅ Hyprland (Wayland) installed!"
 	@echo "   Compositor: Hyprland | Bar: Waybar"
 	@echo "   Screenshots: Grim+Slurp | Lock: Hyprlock | Idle: Hypridle"
@@ -343,30 +349,39 @@ install-gui-hyprland: sanity-check ## Install Hyprland compositor (Wayland)
 	make clean
 
 .PHONY: install-eww
-install-eww: sanity-check ## Install eww "Activate Linux" watermark (Hyprland only)
+install-eww: sanity-check ## Install eww bar + Activate Linux watermark (Hyprland only)
 	@echo "════════════════════════════════════════════════════════"
-	@echo "  Installing eww - Activate Linux watermark"
+	@echo "  Installing eww bar (Everforest)"
 	@echo "════════════════════════════════════════════════════════"
 	yay --noconfirm --needed -S eww
 
-	# Create eww config directory
-	mkdir -p ~/.config/eww
+	# Create config directories
+	mkdir -p ~/.config/eww ~/.config/hypr/scripts ~/.config/skillarch
 
 	# Backup existing configs if they exist and are not symlinks
 	[ -f ~/.config/eww/eww.yuck ] && [ ! -L ~/.config/eww/eww.yuck ] && mv ~/.config/eww/eww.yuck ~/.config/eww/eww.yuck.skabak || true
 	[ -f ~/.config/eww/eww.scss ] && [ ! -L ~/.config/eww/eww.scss ] && mv ~/.config/eww/eww.scss ~/.config/eww/eww.scss.skabak || true
 	[ -d ~/.config/eww/scripts ] && [ ! -L ~/.config/eww/scripts ] && mv ~/.config/eww/scripts ~/.config/eww/scripts.skabak || true
 
-	# Create symlinks
+	# Create symlinks for eww config
 	ln -sf /opt/skillarch/config/hypr/eww/eww.yuck ~/.config/eww/eww.yuck
 	ln -sf /opt/skillarch/config/hypr/eww/eww.scss ~/.config/eww/eww.scss
 	ln -sfn /opt/skillarch/config/hypr/eww/scripts ~/.config/eww/scripts
 	chmod +x /opt/skillarch/config/hypr/eww/scripts/*.sh
 
+	# Symlink start-bar.sh
+	[ -f ~/.config/hypr/scripts/start-bar.sh ] && [ ! -L ~/.config/hypr/scripts/start-bar.sh ] && mv ~/.config/hypr/scripts/start-bar.sh ~/.config/hypr/scripts/start-bar.sh.skabak || true
+	ln -sf /opt/skillarch/config/hypr/scripts/start-bar.sh ~/.config/hypr/scripts/start-bar.sh
+	chmod +x /opt/skillarch/config/hypr/scripts/start-bar.sh
+
+	# Set eww as default bar choice
+	echo "eww" > ~/.config/skillarch/bar-choice
+
 	@echo ""
-	@echo "✅ eww installed!"
-	@echo "   Watermark auto-starts with Hyprland (exec-once configured)"
-	@echo "   Manual: ~/.config/eww/scripts/activate-linux.sh"
+	@echo "✅ eww bar installed!"
+	@echo "   Bar: eww (Everforest) | Watermark: Activate Linux"
+	@echo "   Toggle: ska-bar-toggle (switch between eww and Waybar)"
+	@echo "   Manual: eww daemon && eww open bar"
 	@echo "   Stop:   eww close-all && eww kill"
 
 .PHONY: install-gui
