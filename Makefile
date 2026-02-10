@@ -384,6 +384,39 @@ install-eww: sanity-check ## Install eww bar + Activate Linux watermark (Hyprlan
 	@echo "   Manual: eww daemon && eww open bar"
 	@echo "   Stop:   eww close-all && eww kill"
 
+.PHONY: install-quickshell
+install-quickshell: sanity-check ## Install Quickshell bar (Hyprland only)
+	@echo "════════════════════════════════════════════════════════"
+	@echo "  Installing Quickshell bar (Everforest)"
+	@echo "════════════════════════════════════════════════════════"
+	yes|sudo pacman -S --noconfirm --needed quickshell
+
+	# Create config directories
+	mkdir -p ~/.config/quickshell ~/.config/hypr/scripts ~/.config/skillarch
+
+	# Backup existing configs if they exist and are not symlinks
+	[ -d ~/.config/quickshell ] && [ ! -L ~/.config/quickshell ] && [ "$$(ls -A ~/.config/quickshell 2>/dev/null)" ] && mv ~/.config/quickshell ~/.config/quickshell.skabak || true
+
+	# Symlink entire quickshell config directory
+	rm -rf ~/.config/quickshell
+	ln -sfn /opt/skillarch/config/hypr/quickshell ~/.config/quickshell
+	chmod +x /opt/skillarch/config/hypr/quickshell/scripts/*.sh
+
+	# Symlink start-bar.sh
+	[ -f ~/.config/hypr/scripts/start-bar.sh ] && [ ! -L ~/.config/hypr/scripts/start-bar.sh ] && mv ~/.config/hypr/scripts/start-bar.sh ~/.config/hypr/scripts/start-bar.sh.skabak || true
+	ln -sf /opt/skillarch/config/hypr/scripts/start-bar.sh ~/.config/hypr/scripts/start-bar.sh
+	chmod +x /opt/skillarch/config/hypr/scripts/start-bar.sh
+
+	# Set quickshell as default bar choice
+	echo "quickshell" > ~/.config/skillarch/bar-choice
+
+	@echo ""
+	@echo "✅ Quickshell bar installed!"
+	@echo "   Bar: Quickshell (Everforest) | Watermark: Activate Linux"
+	@echo "   Toggle: ska-bar-toggle (cycle eww -> waybar -> quickshell)"
+	@echo "   Manual: quickshell"
+	@echo "   Stop:   killall quickshell"
+
 .PHONY: install-gui
 install-gui: sanity-check validate-wm-choice install-gui-common ## Install GUI environment (conditional based on WM choice)
 	@echo "════════════════════════════════════════════════════════"

@@ -1,0 +1,2 @@
+singleton GlobalStates 1.0 GlobalStates.qml
+singleton HyprlandData 1.0 HyprlandData.qml

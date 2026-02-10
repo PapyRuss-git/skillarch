@@ -44,17 +44,38 @@
   :initial '{"percent":0,"used":0,"total":0,"icon":"󰍛"}'
   "~/.config/eww/scripts/ram.sh")
 
+(defpoll temperature :interval "5s"
+  :initial '{"temp":0,"icon":"󰔏","class":"normal"}'
+  "~/.config/eww/scripts/temperature.sh")
+
+(defpoll disk :interval "60s"
+  :initial '{"percent":0,"used":"?","icon":"󰋊","class":"normal"}'
+  "~/.config/eww/scripts/disk.sh")
+
+(defpoll updates :interval "1800s"
+  :initial '{"count":0,"icon":"󰏗","class":"none"}'
+  "~/.config/eww/scripts/updates.sh")
+
+(deflisten mic :initial '{"muted":false,"icon":"󰍬","class":""}'
+  "~/.config/eww/scripts/mic.sh")
+
+(deflisten wifi-list :initial "[]"
+  "~/.config/eww/scripts/wifi-list.sh")
+
+(deflisten bluetooth-devices :initial "[]"
+  "~/.config/eww/scripts/bluetooth-devices.sh")
+
 ; ═══════════════════════════════════════════════════════════════
 ; Widgets
 ; ═══════════════════════════════════════════════════════════════
 
-; --- Workspaces (only show occupied/active) ---
-(defwidget workspaces-widget []
+; --- Workspaces (filtered per monitor) ---
+(defwidget workspaces-widget [monitor]
   (box :class "workspaces" :orientation "h" :spacing 0
     (for ws in workspaces
       (button
         :class "ws ${ws.class}"
-        :visible {ws.class != "inactive"}
+        :visible {ws.monitor == monitor}
         :onclick "hyprctl dispatch workspace ${ws.id}"
         "${ws.id}"))))
 
@@ -75,7 +96,7 @@
 ; --- Bluetooth ---
 (defwidget bluetooth-widget []
   (eventbox
-    :onclick "bluetoothctl power $(bluetoothctl show | grep -q 'Powered: yes' && echo off || echo on) &"
+    :onclick "~/.config/eww/scripts/popup-toggle.sh bluetooth-popup"
     :onrightclick "XDG_CURRENT_DESKTOP=GNOME gnome-control-center bluetooth &"
     (label :class "module bluetooth ${bluetooth.class}"
       :text "${bluetooth.icon} ${bluetooth.text}"
@@ -88,11 +109,12 @@
     :onrightclick "nm-connection-editor &"
     (label :class "module vpn ${vpn.class}"
       :text "${vpn.icon} ${vpn.text}"
-      :limit-width 10)))
+      :limit-width 18)))
 
 ; --- Network ---
 (defwidget network-widget []
   (eventbox
+    :onclick "~/.config/eww/scripts/popup-toggle.sh wifi-popup"
     :onrightclick "XDG_CURRENT_DESKTOP=GNOME gnome-control-center wifi &"
     (label :class "module network ${network.status}"
       :text "${network.status == 'connected' ? '${network.icon} ${network.ssid}' : ' ${network.icon} '}"
@@ -117,51 +139,165 @@
   (label :class "module cpu"
     :text "${cpu.icon} ${cpu.percent}%"))
 
+; --- Temperature ---
+(defwidget temperature-widget []
+  (label :class "module temperature ${temperature.class}"
+    :text "${temperature.icon} ${temperature.temp}°C"))
+
 ; --- RAM ---
 (defwidget ram-widget []
   (label :class "module ram"
     :text "${ram.icon} ${ram.percent}%"))
 
+; --- Disk ---
+(defwidget disk-widget []
+  (label :class "module disk ${disk.class}"
+    :text "${disk.icon} ${disk.percent}%"))
+
+; --- Updates ---
+(defwidget updates-widget []
+  (eventbox
+    :onclick "kitty --title 'System Update' sh -c 'yay -Syu; echo Done; read' &"
+    (label :class "module updates ${updates.class}"
+      :text "${updates.icon} ${updates.count}"
+      :visible {updates.count > 0})))
+
+; --- Microphone ---
+(defwidget mic-widget []
+  (eventbox
+    :onclick "pactl set-source-mute @DEFAULT_SOURCE@ toggle"
+    (label :class "module mic ${mic.class}"
+      :text "${mic.icon}")))
+
+; ═══════════════════════════════════════════════════════════════
+; Popup widgets
+; ═══════════════════════════════════════════════════════════════
+
+; --- WiFi popup ---
+(defwidget wifi-popup-widget []
+  (box :class "popup-container" :orientation "v" :spacing 6 :space-evenly false
+    (box :class "popup-header" :orientation "h" :space-evenly false
+      (label :text "󰤨  WiFi" :hexpand true :halign "start")
+      (button :class "popup-toggle ${network.status == 'connected' || wifi-list != '[]' ? 'on' : 'off'}"
+        :onclick "nmcli radio wifi $(nmcli radio wifi | grep -q enabled && echo off || echo on) &"
+        {network.status == "connected" || wifi-list != "[]" ? "ON" : "OFF"}))
+    (scroll :vscroll true :height 300
+      (box :class "popup-list" :orientation "v" :spacing 4
+        (for net in wifi-list
+          (button :class "popup-item ${net.connected ? 'connected' : 'disconnected'}"
+            :onclick "~/.config/eww/scripts/wifi-connect.sh '${net.ssid}' &"
+            (box :orientation "h" :spacing 8 :space-evenly false
+              (label :class "popup-item-icon" :text {net.icon} :width 20)
+              (box :orientation "v" :space-evenly false :hexpand true
+                (label :class "popup-item-name" :text {net.ssid} :halign "start" :limit-width 24)
+                (label :class "popup-item-detail" :halign "start"
+                  :text "${net.signal}%${net.security != '' && net.security != '--' ? '  󰌾 ' : '  '}${net.security != '--' ? net.security : 'Open'}"))
+              (label :class "popup-item-badge" :text {net.connected ? "󰄬" : (net.known ? "󰁯" : "")}
+                :halign "end"))))))))
+
+; --- Bluetooth popup ---
+(defwidget bluetooth-popup-widget []
+  (box :class "popup-container" :orientation "v" :spacing 6 :space-evenly false
+    (box :class "popup-header" :orientation "h" :space-evenly false
+      (label :text "󰂯  Bluetooth" :hexpand true :halign "start")
+      (button :class "popup-toggle ${bluetooth.status != 'off' ? 'on' : 'off'}"
+        :onclick "bluetoothctl power $(bluetoothctl show | grep -q 'Powered: yes' && echo off || echo on) &"
+        {bluetooth.status != "off" ? "ON" : "OFF"}))
+    (scroll :vscroll true :height 240
+      (box :class "popup-list" :orientation "v" :spacing 4
+        (for dev in bluetooth-devices
+          (button :class "popup-item ${dev.connected ? 'connected' : 'disconnected'}"
+            :onclick "~/.config/eww/scripts/bluetooth-toggle-device.sh '${dev.mac}' &"
+            (box :orientation "h" :spacing 8 :space-evenly false
+              (label :class "popup-item-icon" :text {dev.icon} :width 20)
+              (box :orientation "v" :space-evenly false :hexpand true
+                (label :class "popup-item-name" :text {dev.name} :halign "start" :limit-width 20)
+                (label :class "popup-item-detail" :halign "start"
+                  :text "${dev.connected ? 'Connected' : 'Disconnected'}${dev.battery != '' ? '  󰁹 ${dev.battery}%' : ''}"))
+              (label :class "popup-item-badge ${dev.connected ? 'active' : ''}"
+                :text {dev.connected ? "󰄬" : ""}
+                :halign "end"))))))))
+
 ; ═══════════════════════════════════════════════════════════════
 ; Bar layout
 ; ═══════════════════════════════════════════════════════════════
 
-(defwidget bar-left []
-  (box :halign "start" :spacing 0 :space-evenly false
-    (workspaces-widget)))
-
-(defwidget bar-center []
-  (box :halign "center" :spacing 0 :space-evenly false
-    (clock-widget)))
-
-(defwidget bar-right []
-  (box :halign "end" :spacing 2 :space-evenly false
-    (volume-widget)
-    (bluetooth-widget)
-    (vpn-widget)
-    (network-widget)
-    (brightness-widget)
-    (battery-widget)
-    (cpu-widget)
-    (ram-widget)))
-
-(defwidget bar-layout []
+; --- Full bar layout (parameterized by monitor) ---
+(defwidget bar-layout [monitor]
   (centerbox :orientation "h" :class "bar-inner"
-    (bar-left)
-    (bar-center)
-    (bar-right)))
+    (box :halign "start" :spacing 0 :space-evenly false
+      (label :class "clock" :text clock))
+    (box :halign "center" :spacing 0 :space-evenly false
+      (workspaces-widget :monitor monitor))
+    (box :halign "end" :spacing 2 :space-evenly false
+      (volume-widget)
+      (mic-widget)
+      (bluetooth-widget)
+      (vpn-widget)
+      (network-widget)
+      (brightness-widget)
+      (battery-widget)
+      (box :class "system-group" :orientation "h" :spacing 2 :space-evenly false
+        (cpu-widget)
+        (temperature-widget)
+        (ram-widget)
+        (disk-widget))
+      (updates-widget)
+      (label :class "clock clock-date" :text clock-date))))
+
+; --- Minimal bar for vertical monitors (parameterized by monitor) ---
+(defwidget bar-minimal-layout [monitor]
+  (centerbox :orientation "h" :class "bar-inner"
+    (box :halign "start" :spacing 0 :space-evenly false
+      (label :class "clock" :text clock))
+    (box :halign "center" :spacing 0 :space-evenly false
+      (workspaces-widget :monitor monitor))
+    (box :halign "end" :spacing 0 :space-evenly false
+      (label :class "clock clock-date" :text clock-date))))
 
 ; ═══════════════════════════════════════════════════════════════
-; Windows
+; Windows (one per monitor, full and minimal variants)
 ; ═══════════════════════════════════════════════════════════════
 
-(defwindow bar
-  :monitor 0
-  :stacking "fg"
-  :exclusive true
-  :focusable false
+(defwindow bar-0
+  :monitor 0 :stacking "fg" :exclusive true :focusable false
   :geometry (geometry :x "0px" :y "0px" :width "100%" :height "32px" :anchor "top center")
-  (bar-layout))
+  (bar-layout :monitor 0))
+
+(defwindow bar-1
+  :monitor 1 :stacking "fg" :exclusive true :focusable false
+  :geometry (geometry :x "0px" :y "0px" :width "100%" :height "32px" :anchor "top center")
+  (bar-layout :monitor 1))
+
+(defwindow bar-2
+  :monitor 2 :stacking "fg" :exclusive true :focusable false
+  :geometry (geometry :x "0px" :y "0px" :width "100%" :height "32px" :anchor "top center")
+  (bar-layout :monitor 2))
+
+(defwindow bar-3
+  :monitor 3 :stacking "fg" :exclusive true :focusable false
+  :geometry (geometry :x "0px" :y "0px" :width "100%" :height "32px" :anchor "top center")
+  (bar-layout :monitor 3))
+
+(defwindow bar-minimal-0
+  :monitor 0 :stacking "fg" :exclusive true :focusable false
+  :geometry (geometry :x "0px" :y "0px" :width "100%" :height "32px" :anchor "top center")
+  (bar-minimal-layout :monitor 0))
+
+(defwindow bar-minimal-1
+  :monitor 1 :stacking "fg" :exclusive true :focusable false
+  :geometry (geometry :x "0px" :y "0px" :width "100%" :height "32px" :anchor "top center")
+  (bar-minimal-layout :monitor 1))
+
+(defwindow bar-minimal-2
+  :monitor 2 :stacking "fg" :exclusive true :focusable false
+  :geometry (geometry :x "0px" :y "0px" :width "100%" :height "32px" :anchor "top center")
+  (bar-minimal-layout :monitor 2))
+
+(defwindow bar-minimal-3
+  :monitor 3 :stacking "fg" :exclusive true :focusable false
+  :geometry (geometry :x "0px" :y "0px" :width "100%" :height "32px" :anchor "top center")
+  (bar-minimal-layout :monitor 3))
 
 ; ═══════════════════════════════════════════════════════════════
 ; Activate Linux watermark (preserved from original)
@@ -211,3 +347,71 @@
   :focusable false
   :geometry (geometry :x "16px" :y "48px" :width "280px" :anchor "bottom right")
   (activate-linux))
+
+; ═══════════════════════════════════════════════════════════════
+; Popup closer (invisible fullscreen click-catcher behind popups)
+; ═══════════════════════════════════════════════════════════════
+
+(defwindow closer-0
+  :monitor 0 :stacking "fg" :exclusive false :focusable false
+  :geometry (geometry :width "100%" :height "100%")
+  (button :class "closer" :onclick "~/.config/eww/scripts/popup-close-all.sh"))
+
+(defwindow closer-1
+  :monitor 1 :stacking "fg" :exclusive false :focusable false
+  :geometry (geometry :width "100%" :height "100%")
+  (button :class "closer" :onclick "~/.config/eww/scripts/popup-close-all.sh"))
+
+(defwindow closer-2
+  :monitor 2 :stacking "fg" :exclusive false :focusable false
+  :geometry (geometry :width "100%" :height "100%")
+  (button :class "closer" :onclick "~/.config/eww/scripts/popup-close-all.sh"))
+
+(defwindow closer-3
+  :monitor 3 :stacking "fg" :exclusive false :focusable false
+  :geometry (geometry :width "100%" :height "100%")
+  (button :class "closer" :onclick "~/.config/eww/scripts/popup-close-all.sh"))
+
+; ═══════════════════════════════════════════════════════════════
+; Popup windows (overlay = above closer, below nothing)
+; ═══════════════════════════════════════════════════════════════
+
+(defwindow wifi-popup-0
+  :monitor 0 :stacking "overlay" :exclusive false :focusable false
+  :geometry (geometry :x "0px" :y "36px" :width "300px" :height "350px" :anchor "top right")
+  (wifi-popup-widget))
+
+(defwindow wifi-popup-1
+  :monitor 1 :stacking "overlay" :exclusive false :focusable false
+  :geometry (geometry :x "0px" :y "36px" :width "300px" :height "350px" :anchor "top right")
+  (wifi-popup-widget))
+
+(defwindow wifi-popup-2
+  :monitor 2 :stacking "overlay" :exclusive false :focusable false
+  :geometry (geometry :x "0px" :y "36px" :width "300px" :height "350px" :anchor "top right")
+  (wifi-popup-widget))
+
+(defwindow wifi-popup-3
+  :monitor 3 :stacking "overlay" :exclusive false :focusable false
+  :geometry (geometry :x "0px" :y "36px" :width "300px" :height "350px" :anchor "top right")
+  (wifi-popup-widget))
+
+(defwindow bluetooth-popup-0
+  :monitor 0 :stacking "overlay" :exclusive false :focusable false
+  :geometry (geometry :x "0px" :y "36px" :width "280px" :height "300px" :anchor "top right")
+  (bluetooth-popup-widget))
+
+(defwindow bluetooth-popup-1
+  :monitor 1 :stacking "overlay" :exclusive false :focusable false
+  :geometry (geometry :x "0px" :y "36px" :width "280px" :height "300px" :anchor "top right")
+  (bluetooth-popup-widget))
+
+(defwindow bluetooth-popup-2
+  :monitor 2 :stacking "overlay" :exclusive false :focusable false
+  :geometry (geometry :x "0px" :y "36px" :width "280px" :height "300px" :anchor "top right")
+  (bluetooth-popup-widget))
+
+(defwindow bluetooth-popup-3
+  :monitor 3 :stacking "overlay" :exclusive false :focusable false
+  :geometry (geometry :x "0px" :y "36px" :width "280px" :height "300px" :anchor "top right")
+  (bluetooth-popup-widget))

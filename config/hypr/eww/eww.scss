@@ -64,9 +64,10 @@ window {
     margin: 0;
 
     .ws {
-        padding: 0 2px;
+        padding: 2px 6px;
         margin: 0px 1px;
         min-width: 0;
+        font-size: 18px;
         border-radius: 7px;
         color: $fg-primary;
         border: 1px solid rgba(211, 198, 170, 0.15);
@@ -199,8 +200,22 @@ window {
 }
 
 // ═══════════════════════════════════════════════════════════════
-// CPU & RAM
+// System group (cpu, temp, ram, disk)
 // ═══════════════════════════════════════════════════════════════
+
+.system-group {
+    border: 1px solid rgba(127, 187, 179, 0.3);
+    border-radius: 7px;
+    padding: 0px 2px;
+
+    .module {
+        border: none;
+
+        &:hover {
+            border: none;
+        }
+    }
+}
 
 .cpu {
     color: $blue;
@@ -208,6 +223,166 @@ window {
 
 .ram {
     color: $purple;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// Temperature
+// ═══════════════════════════════════════════════════════════════
+
+.temperature {
+    color: $fg-primary;
+
+    &.warning {
+        color: $orange;
+    }
+
+    &.critical {
+        color: $red;
+        animation: blink 0.5s linear infinite alternate;
+    }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// Disk
+// ═══════════════════════════════════════════════════════════════
+
+.disk {
+    color: $fg-primary;
+
+    &.warning {
+        color: $orange;
+    }
+
+    &.critical {
+        color: $red;
+    }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// Updates
+// ═══════════════════════════════════════════════════════════════
+
+.updates {
+    &.available {
+        color: $yellow;
+    }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// Microphone
+// ═══════════════════════════════════════════════════════════════
+
+.mic {
+    &.muted {
+        color: $red;
+    }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// Popup windows (WiFi, Bluetooth)
+// ═══════════════════════════════════════════════════════════════
+
+.closer {
+    background-color: transparent;
+}
+
+.popup-container {
+    background-color: $bg-surface;
+    border: 1px solid rgba($fg-primary, 0.25);
+    border-radius: 12px;
+    padding: 12px;
+
+    scrollbar {
+        background-color: transparent;
+
+        slider {
+            background-color: rgba($fg-dimmed, 0.3);
+            border-radius: 4px;
+            min-width: 4px;
+            min-height: 20px;
+
+            &:hover {
+                background-color: rgba($fg-dimmed, 0.5);
+            }
+        }
+    }
+}
+
+.popup-header {
+    color: $fg-second;
+    font-size: 12px;
+    margin-bottom: 8px;
+    padding: 0 4px;
+}
+
+.popup-toggle {
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 11px;
+    transition: all 200ms ease;
+
+    &.on {
+        color: $bg-dim;
+        background-color: $green;
+    }
+
+    &.off {
+        color: $fg-dimmed;
+        background-color: $bg-float;
+    }
+
+    &:hover {
+        opacity: 0.85;
+    }
+}
+
+.popup-list {
+    padding: 0 2px;
+}
+
+.popup-item {
+    padding: 6px 10px;
+    border-radius: 6px;
+    transition: all 200ms ease;
+
+    &:hover {
+        background-color: $bg-float;
+    }
+
+    &.connected {
+        border-left: 2px solid $green;
+        background-color: rgba($green, 0.08);
+    }
+
+    &.disconnected {
+        .popup-item-name {
+            color: $fg-second;
+        }
+    }
+}
+
+.popup-item-icon {
+    color: $fg-second;
+    font-size: 16px;
+}
+
+.popup-item-name {
+    color: $fg-primary;
+    font-size: 13px;
+}
+
+.popup-item-detail {
+    color: $fg-dimmed;
+    font-size: 11px;
+}
+
+.popup-item-badge {
+    color: $green;
+    font-size: 14px;
+
+    &.active {
+        color: $green;
+    }
 }
 
 // ═══════════════════════════════════════════════════════════════

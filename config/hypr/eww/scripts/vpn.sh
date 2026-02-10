@@ -10,9 +10,14 @@ vpn_interfaces=$(ip link show 2>/dev/null | grep -cE "(tun|tap|wg)" 2>/dev/null 
 vpn_interfaces=${vpn_interfaces:-0}
 
 if [ "$vpn_connections" -gt 0 ] || [ "$openvpn_status" = "1" ] || [ "$wireguard_status" = "1" ] || [ "$vpn_interfaces" -gt 0 ]; then
-    vpn_name=$(nmcli connection show --active 2>/dev/null | grep -E "(vpn|tun|wireguard)" | head -1 | awk '{print $1}' | cut -c1-10)
-    if [ -n "$vpn_name" ]; then
-        echo "{\"status\":\"connected\",\"icon\":\"󰒃\",\"text\":\"$vpn_name\",\"class\":\"connected\"}"
+    # Get the IP from the VPN interface (tun0, wg0, tap0)
+    vpn_ip=""
+    for iface in tun0 tun1 wg0 wg1 tap0 tap1; do
+        vpn_ip=$(ip -4 addr show "$iface" 2>/dev/null | grep -oP 'inet \K[0-9.]+' | head -1)
+        [ -n "$vpn_ip" ] && break
+    done
+    if [ -n "$vpn_ip" ]; then
+        echo "{\"status\":\"connected\",\"icon\":\"󰒃\",\"text\":\"$vpn_ip\",\"class\":\"connected\"}"
     else
         echo "{\"status\":\"connected\",\"icon\":\"󰒃\",\"text\":\"VPN\",\"class\":\"connected\"}"
     fi

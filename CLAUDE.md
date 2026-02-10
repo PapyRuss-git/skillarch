@@ -26,6 +26,7 @@ SkillArch is a Linux penetration testing and cybersecurity distribution built on
 - `make install-docker` - Install and configure Docker
 - `make install-gui` - Install i3, polybar, kitty, rofi, and GUI components
 - `make install-eww` - Install eww bar (alternative to Waybar for Hyprland)
+- `make install-quickshell` - Install Quickshell bar (C++/Qt6/QML alternative, lowest CPU usage)
 - `make install-gui-tools` - Install GUI applications
 - `make install-offensive` - Install penetration testing tools
 - `make install-wordlists` - Install security wordlists
@@ -49,7 +50,8 @@ SkillArch is a Linux penetration testing and cybersecurity distribution built on
 - `ska-wm-info` - Display current window manager info (planned)
 - `ska-bar-waybar` - Switch to Waybar (Hyprland)
 - `ska-bar-eww` - Switch to eww bar (Hyprland)
-- `ska-bar-toggle` - Toggle between Waybar and eww
+- `ska-bar-quickshell` - Switch to Quickshell bar (Hyprland)
+- `ska-bar-toggle` - Cycle between eww, Waybar, and Quickshell
 - `ska-bar-info` - Show current bar choice
 
 ## Architecture and Structure
@@ -98,6 +100,7 @@ Centralized configuration with atomic symlink operations from `/opt/skillarch/co
 - `config/hypr/hyprpaper.conf` → `~/.config/hypr/hyprpaper.conf`
 - `config/hypr/waybar/` → `~/.config/waybar/`
 - `config/hypr/eww/` → `~/.config/eww/` (alternative bar, install via `make install-eww`)
+- `config/hypr/quickshell/` → `~/.config/quickshell/` (C++/Qt6/QML bar, install via `make install-quickshell`)
 - `config/hypr/scripts/` → `~/.config/hypr/scripts/` (bar launcher, etc.)
 - `config/hypr/dunst/` → `~/.config/dunst/`
 - `config/hypr/clipse/` → `~/.config/clipse/`
@@ -164,7 +167,7 @@ SkillArch supports two distinct window manager setups. Currently both are instal
 **Hyprland (Wayland Stack)**
 - **Terminal**: Kitty with Everforest theme
 - **Compositor**: Hyprland with GNOME coexistence
-- **Status Bar**: Waybar (default) or eww (alternative, install via `make install-eww`)
+- **Status Bar**: Waybar (default), eww (alternative, `make install-eww`), or Quickshell (C++/Qt6/QML, `make install-quickshell`)
 - **Launcher**: Rofi (Wayland mode)
 - **Notifications**: Dunst
 - **Background**: Hyprpaper
@@ -172,7 +175,7 @@ SkillArch supports two distinct window manager setups. Currently both are instal
 - **Lock Screen**: Hyprlock
 - **Clipboard**: wl-clipboard + Clipse
 - **Idle Management**: Hypridle
-- **Bar Switching**: `ska-bar-toggle` to switch between Waybar and eww
+- **Bar Switching**: `ska-bar-toggle` to cycle between Waybar, eww, and Quickshell
 
 **Common Components** (Both Environments)
 - **File Manager**: Nautilus (GNOME)

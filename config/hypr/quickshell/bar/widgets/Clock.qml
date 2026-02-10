@@ -1,0 +1,43 @@
+import QtQuick
+import QtQuick.Layouts
+import Quickshell
+import "../.."
+
+RowLayout {
+    id: root
+
+    signal clicked()
+
+    spacing: 6
+
+    SystemClock {
+        id: clock
+        precision: SystemClock.Minutes
+    }
+
+    Text {
+        text: {
+            var h = clock.hours.toString().padStart(2, '0');
+            var m = clock.minutes.toString().padStart(2, '0');
+            return h + ":" + m;
+        }
+        font.family: Theme.fontFamily
+        font.pixelSize: Theme.fontSizeNormal
+        font.bold: true
+        color: Theme.fgPrimary
+
+        MouseArea {
+            anchors.fill: parent
+            onClicked: root.clicked()
+        }
+    }
+
+    Text {
+        text: Qt.formatDate(new Date(), "ddd dd MMM")
+        font.family: Theme.fontFamily
+        font.pixelSize: Theme.fontSizeSmall
+        font.bold: true
+        color: Theme.fgSecond
+        Layout.alignment: Qt.AlignVCenter
+    }
+}

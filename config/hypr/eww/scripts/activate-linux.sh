@@ -8,9 +8,8 @@ if ! pgrep -x eww >/dev/null; then
     sleep 0.5
 fi
 
-# Get number of monitors from eww (parse error message)
-eww_output=$(eww open activate-linux-0 --screen "NONEXISTENT" 2>&1 || true)
-monitor_count=$(echo "$eww_output" | grep -cP '\[\d+\]' || echo "1")
+# Get number of monitors from Hyprland
+monitor_count=$(hyprctl monitors -j | jq 'length')
 
 # Open watermark on each monitor
 for ((i=0; i<monitor_count; i++)); do
