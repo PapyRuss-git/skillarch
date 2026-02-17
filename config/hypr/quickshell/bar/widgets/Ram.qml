@@ -10,7 +10,7 @@ ModuleLabel {
     property int percent: 0
 
     text: "\u{f035b}  " + percent + "%"  // 󰍛
-    textColor: Theme.purple
+    textColor: Theme.tertiary
 
     FileView {
         id: memFile

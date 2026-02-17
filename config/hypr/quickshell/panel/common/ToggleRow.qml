@@ -8,15 +8,16 @@ Rectangle {
     property string icon: ""
     property string label: ""
     property bool active: false
+    property real iconScale: 1.0
 
     signal clicked()
 
     implicitWidth: 90
     implicitHeight: 36
     radius: 8
-    color: active ? Qt.rgba(Theme.green.r, Theme.green.g, Theme.green.b, 0.15) : Theme.bgFloat
+    color: active ? Theme.withAlpha(Theme.primary, 0.15) : Theme.surfaceContainer
     border.width: 1
-    border.color: active ? Qt.rgba(Theme.green.r, Theme.green.g, Theme.green.b, 0.3) : "transparent"
+    border.color: active ? Theme.withAlpha(Theme.primary, 0.3) : "transparent"
 
 
     RowLayout {
@@ -26,8 +27,8 @@ Rectangle {
         Text {
             text: root.icon
             font.family: Theme.fontFamily
-            font.pixelSize: 16
-            color: root.active ? Theme.green : Theme.fgSecond
+            font.pixelSize: 16 * root.iconScale
+            color: root.active ? Theme.primary : Theme.surfaceVariantFg
         }
 
         Text {
@@ -35,7 +36,7 @@ Rectangle {
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeTiny
             font.bold: true
-            color: root.active ? Theme.fgPrimary : Theme.fgSecond
+            color: root.active ? Theme.surfaceFg : Theme.surfaceVariantFg
         }
     }
 

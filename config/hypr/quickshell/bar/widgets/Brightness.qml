@@ -16,7 +16,7 @@ ClickableModule {
     }
 
     text: "\u{f00df}  " + percent + "%"
-    textColor: Theme.fgPrimary
+    textColor: Theme.surfaceFg
 
     onScrolledUp: brightUp.running = true
     onScrolledDown: brightDown.running = true

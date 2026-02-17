@@ -109,7 +109,7 @@ Scope {
             Rectangle {
                 anchors.fill: parent
                 radius: Theme.popupRadius
-                color: Theme.bgSurface
+                color: Theme.surfaceContainerLow
                 border.width: 1
                 border.color: Theme.borderLight
 
@@ -134,7 +134,14 @@ Scope {
 
                         MicToggle { Layout.fillWidth: true }
                         VpnToggle { Layout.fillWidth: true }
+                    }
+
+                    RowLayout {
+                        Layout.fillWidth: true
+                        spacing: 8
+
                         NightLightToggle { Layout.fillWidth: true }
+                        AnimationsToggle { Layout.fillWidth: true }
                     }
 
                     Rectangle {

@@ -12,7 +12,7 @@ ClickableModule {
     property string icon: "\u{f00b2}"
 
     text: icon + (btText !== "" ? " " + btText : "")
-    textColor: status === "off" ? Theme.fgDimmed : Theme.fgPrimary
+    textColor: status === "off" ? Theme.outlineVariant : Theme.surfaceFg
 
     onRightClicked: gnomeBt.startDetached()
 
@@ -23,7 +23,7 @@ ClickableModule {
 
     Process {
         id: btPoll
-        command: [Quickshell.shellRoot + "/scripts/bluetooth.sh"]
+        command: [Quickshell.shellDir + "/scripts/bluetooth.sh"]
         running: true
         stdout: StdioCollector {
             onStreamFinished: {

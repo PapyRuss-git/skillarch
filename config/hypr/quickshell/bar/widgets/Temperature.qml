@@ -11,9 +11,9 @@ ModuleLabel {
     property string tempClass: temp > 85 ? "critical" : temp > 70 ? "warning" : "normal"
 
     text: "\u{f0510}  " + temp + "\u00B0C"  // 󰔐
-    textColor: tempClass === "critical" ? Theme.red
-             : tempClass === "warning" ? Theme.orange
-             : Theme.fgPrimary
+    textColor: tempClass === "critical" ? Theme.error
+             : tempClass === "warning" ? Theme.warning
+             : Theme.surfaceFg
 
     // Blinking animation for critical temps
     SequentialAnimation on opacity {

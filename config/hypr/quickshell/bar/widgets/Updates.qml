@@ -11,7 +11,7 @@ ClickableModule {
 
     visible: count > 0
     text: "\u{f0397}  " + count
-    textColor: Theme.yellow
+    textColor: Theme.info
 
     onClicked: updateCmd.startDetached()
 
@@ -22,7 +22,7 @@ ClickableModule {
 
     Process {
         id: updatesPoll
-        command: [Quickshell.shellRoot + "/scripts/updates.sh"]
+        command: [Quickshell.shellDir + "/scripts/updates.sh"]
         running: true
         stdout: StdioCollector {
             onStreamFinished: {

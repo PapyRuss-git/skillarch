@@ -25,7 +25,7 @@ ToggleRow {
 
     Process {
         id: vpnPoll
-        command: [Quickshell.shellRoot + "/scripts/vpn.sh"]
+        command: [Quickshell.shellDir + "/scripts/vpn.sh"]
         running: true
         stdout: StdioCollector {
             onStreamFinished: {

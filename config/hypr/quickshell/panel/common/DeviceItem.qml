@@ -16,9 +16,9 @@ Rectangle {
     Layout.fillWidth: true
     implicitHeight: 44
     radius: 6
-    color: mouseArea.containsMouse ? Theme.bgFloat : "transparent"
+    color: mouseArea.containsMouse ? Theme.surfaceContainer : "transparent"
     border.width: connected ? 2 : 0
-    border.color: connected ? Theme.green : "transparent"
+    border.color: connected ? Theme.primary : "transparent"
 
 
     RowLayout {
@@ -31,7 +31,7 @@ Rectangle {
             text: root.icon
             font.family: Theme.fontFamily
             font.pixelSize: 16
-            color: Theme.fgSecond
+            color: Theme.surfaceVariantFg
             Layout.preferredWidth: 20
         }
 
@@ -44,7 +44,7 @@ Rectangle {
                 font.family: Theme.fontFamily
                 font.pixelSize: 13
                 font.bold: true
-                color: Theme.fgPrimary
+                color: Theme.surfaceFg
                 elide: Text.ElideRight
                 Layout.fillWidth: true
             }
@@ -53,7 +53,7 @@ Rectangle {
                 text: root.detail
                 font.family: Theme.fontFamily
                 font.pixelSize: Theme.fontSizeTiny
-                color: Theme.fgDimmed
+                color: Theme.outlineVariant
                 visible: detail !== ""
             }
         }
@@ -62,7 +62,7 @@ Rectangle {
             text: root.badge
             font.family: Theme.fontFamily
             font.pixelSize: 14
-            color: Theme.green
+            color: Theme.primary
             visible: badge !== ""
         }
     }

@@ -12,10 +12,10 @@ ClickableModule {
     property string icon: "\u{f092d}"
 
     text: status === "connected" ? icon + "  " + ssid : " " + icon + " "
-    textColor: status === "disconnected" ? Theme.bgDim : Theme.fgPrimary
+    textColor: status === "disconnected" ? Theme.surfaceDim : Theme.surfaceFg
 
-    border.color: status === "disconnected" ? Theme.red : (hovered ? Theme.borderHover : Theme.borderSubtle)
-    color: status === "disconnected" ? Theme.red : "transparent"
+    border.color: status === "disconnected" ? Theme.error : (hovered ? Theme.borderHover : Theme.borderSubtle)
+    color: status === "disconnected" ? Theme.error : "transparent"
 
     onRightClicked: gnomeWifi.startDetached()
 
@@ -26,7 +26,7 @@ ClickableModule {
 
     Process {
         id: networkPoll
-        command: [Quickshell.shellRoot + "/scripts/network.sh"]
+        command: [Quickshell.shellDir + "/scripts/network.sh"]
         running: true
         stdout: StdioCollector {
             onStreamFinished: {

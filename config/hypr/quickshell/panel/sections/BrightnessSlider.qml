@@ -8,7 +8,12 @@ import "../common"
 SliderRow {
     id: root
 
-    icon: "\u{f00df}"
+    icon: {
+        if (percent <= 25) return "\u{f00d7}"      // Très faible
+        else if (percent <= 50) return "\u{f00d8}" // Faible-moyen
+        else if (percent <= 75) return "\u{f00d9}" // Moyen-haut
+        else return "\u{f00da}"                     // Très haut
+    }
     value: percent / 100.0
 
     property int percent: 50

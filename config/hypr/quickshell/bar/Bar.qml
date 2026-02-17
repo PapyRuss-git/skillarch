@@ -66,7 +66,7 @@ PanelWindow {
                     font.family: Theme.fontFamily
                     font.pixelSize: Theme.fontSizeNormal
                     font.bold: true
-                    color: Theme.fgPrimary
+                    color: Theme.surfaceFg
 
                     SystemClock {
                         id: minimalClock
@@ -106,7 +106,6 @@ PanelWindow {
 
                     Volume {}
                     QuickSettingsButton { barScreen: root.screen }
-                    Brightness {}
                     Battery {}
                     SystemGroup {}
                     Updates {}

@@ -12,7 +12,7 @@ ModuleLabel {
     property var prevTotal: 0
 
     text: "\u{f0bf2}  " + percent + "%"  // 󰻠
-    textColor: Theme.blue
+    textColor: Theme.secondary
 
     FileView {
         id: statFile

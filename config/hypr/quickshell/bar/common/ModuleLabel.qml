@@ -25,6 +25,6 @@ Rectangle {
         font.family: Theme.fontFamily
         font.pixelSize: Theme.fontSizeNormal
         font.bold: true
-        color: Theme.fgPrimary
+        color: Theme.surfaceFg
     }
 }

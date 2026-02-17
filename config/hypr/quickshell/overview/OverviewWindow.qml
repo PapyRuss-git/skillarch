@@ -44,7 +44,7 @@ Item {
         // Fallback when no capture available
         Rectangle {
             anchors.fill: parent
-            color: Theme.bgSurface
+            color: Theme.surfaceContainerLow
             visible: !screencopy.hasContent
             radius: Theme.windowRounding * root.previewScale
 

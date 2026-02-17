@@ -28,9 +28,9 @@ Rectangle {
         return "normal";
     }
 
-    property color stateColor: worstState === "critical" ? Theme.red
-                              : worstState === "warning" ? Theme.orange
-                              : Theme.fgDimmed
+    property color stateColor: worstState === "critical" ? Theme.error
+                              : worstState === "warning" ? Theme.warning
+                              : Theme.outlineVariant
 
     implicitWidth: expanded ? label.implicitWidth + 10 : 18
     implicitHeight: Theme.barHeight - 8
@@ -150,7 +150,7 @@ Rectangle {
     // --- Disk ---
     Process {
         id: diskPoll
-        command: [Quickshell.shellRoot + "/scripts/disk.sh"]
+        command: [Quickshell.shellDir + "/scripts/disk.sh"]
         running: true
         stdout: StdioCollector {
             onStreamFinished: {

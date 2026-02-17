@@ -41,7 +41,7 @@ Item {
     Rectangle {
         anchors.fill: parent
         radius: Theme.overviewRounding
-        color: Theme.bgDim
+        color: Theme.surfaceDim
         border.width: 1
         border.color: Theme.borderSubtle
     }
@@ -75,9 +75,9 @@ Item {
                     id: wsBg
                     anchors.fill: parent
                     radius: Theme.overviewRounding - 4
-                    color: dropArea.containsDrag ? Qt.lighter(Theme.bgBase, 1.2) : Theme.bgBase
+                    color: dropArea.containsDrag ? Qt.lighter(Theme.surface, 1.2) : Theme.surface
                     border.width: isActive ? 2 : (wsMouseArea.containsMouse ? 1 : 0)
-                    border.color: isActive ? Theme.green : Theme.borderHover
+                    border.color: isActive ? Theme.primary : Theme.borderHover
 
                     Behavior on border.width {
                         NumberAnimation { duration: 80; easing.type: Easing.OutQuad }
@@ -90,12 +90,7 @@ Item {
                         font.family: Theme.fontFamily
                         font.pixelSize: root.wsHeight * 0.4
                         font.bold: true
-                        color: Qt.rgba(
-                            Theme.fgDimmed.r,
-                            Theme.fgDimmed.g,
-                            Theme.fgDimmed.b,
-                            0.15
-                        )
+                        color: Theme.withAlpha(Theme.outlineVariant, 0.15)
                     }
 
                     // Windows in this workspace

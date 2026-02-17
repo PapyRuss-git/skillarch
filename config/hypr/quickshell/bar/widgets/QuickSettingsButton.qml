@@ -29,6 +29,15 @@ Rectangle {
     property var source: Pipewire.defaultAudioSource
     property bool micMuted: source && source.audio ? source.audio.muted : false
 
+    // Brightness state
+    property int brightPercent: 0
+    property string brightIcon: "\u{f00df}"
+
+    Connections {
+        target: GlobalStates
+        function onBrightnessRefreshCountChanged() { brightPoll.running = true; }
+    }
+
     implicitWidth: iconsRow.implicitWidth + 12
     implicitHeight: Theme.barHeight - 8
     radius: Theme.moduleRadius
@@ -47,29 +56,36 @@ Rectangle {
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeNormal
             font.bold: true
-            color: root.netStatus === "disconnected" ? Theme.red : Theme.fgPrimary
+            color: root.netStatus === "disconnected" ? Theme.error : Theme.surfaceFg
             text: root.netIcon
         }
         Text {
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeNormal
             font.bold: true
-            color: root.btStatus === "off" ? Theme.fgDimmed : Theme.fgPrimary
+            color: root.btStatus === "off" ? Theme.outlineVariant : Theme.surfaceFg
             text: root.btIcon
         }
         Text {
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeNormal
             font.bold: true
-            color: root.vpnStatus === "connected" ? Theme.green : Theme.red
+            color: root.vpnStatus === "connected" ? Theme.primary : Theme.error
             text: root.vpnIcon
         }
         Text {
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeNormal
             font.bold: true
-            color: root.micMuted ? Theme.red : Theme.fgPrimary
+            color: root.micMuted ? Theme.error : Theme.surfaceFg
             text: root.micMuted ? "\u{f036d}" : "\u{f036c}"
+        }
+        Text {
+            font.family: Theme.fontFamily
+            font.pixelSize: Theme.fontSizeNormal
+            font.bold: true
+            color: Theme.surfaceFg
+            text: root.brightIcon + "  " + root.brightPercent + "%"
         }
     }
 
@@ -77,11 +93,18 @@ Rectangle {
         id: mouseArea
         anchors.fill: parent
         hoverEnabled: true
+        acceptedButtons: Qt.LeftButton
         onClicked: {
             if (GlobalStates.quickSettingsScreen === root.barScreen)
                 GlobalStates.quickSettingsScreen = null;
             else
                 GlobalStates.quickSettingsScreen = root.barScreen;
+        }
+        onWheel: event => {
+            if (event.angleDelta.y > 0)
+                brightUp.running = true;
+            else if (event.angleDelta.y < 0)
+                brightDown.running = true;
         }
     }
 
@@ -89,7 +112,7 @@ Rectangle {
 
     Process {
         id: networkPoll
-        command: [Quickshell.shellRoot + "/scripts/network.sh"]
+        command: [Quickshell.shellDir + "/scripts/network.sh"]
         running: true
         stdout: StdioCollector {
             onStreamFinished: {
@@ -104,7 +127,7 @@ Rectangle {
 
     Process {
         id: btPoll
-        command: [Quickshell.shellRoot + "/scripts/bluetooth.sh"]
+        command: [Quickshell.shellDir + "/scripts/bluetooth.sh"]
         running: true
         stdout: StdioCollector {
             onStreamFinished: {
@@ -119,7 +142,7 @@ Rectangle {
 
     Process {
         id: vpnPoll
-        command: [Quickshell.shellRoot + "/scripts/vpn.sh"]
+        command: [Quickshell.shellDir + "/scripts/vpn.sh"]
         running: true
         stdout: StdioCollector {
             onStreamFinished: {
@@ -132,6 +155,35 @@ Rectangle {
         }
     }
 
+    Process {
+        id: brightPoll
+        command: ["brightnessctl", "info", "-m"]
+        running: true
+        stdout: StdioCollector {
+            onStreamFinished: {
+                var parts = this.text.trim().split(',');
+                if (parts.length >= 4)
+                    root.brightPercent = parseInt(parts[3].replace('%', ''));
+            }
+        }
+    }
+
+    Process {
+        id: brightUp
+        command: ["brightnessctl", "set", "+5%"]
+        stdout: StdioCollector {
+            onStreamFinished: brightPoll.running = true
+        }
+    }
+
+    Process {
+        id: brightDown
+        command: ["brightnessctl", "set", "5%-"]
+        stdout: StdioCollector {
+            onStreamFinished: brightPoll.running = true
+        }
+    }
+
     Timer {
         interval: 5000
         running: true
@@ -140,6 +192,7 @@ Rectangle {
             networkPoll.running = true;
             btPoll.running = true;
             vpnPoll.running = true;
+            brightPoll.running = true;
         }
     }
 }

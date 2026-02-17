@@ -44,7 +44,7 @@ ColumnLayout {
 
             onClicked: {
                 wifiConnect.command = [
-                    Quickshell.shellRoot + "/scripts/wifi-connect.sh",
+                    Quickshell.shellDir + "/scripts/wifi-connect.sh",
                     modelData.ssid
                 ];
                 wifiConnect.running = true;
@@ -73,7 +73,7 @@ ColumnLayout {
 
     Process {
         id: wifiListPoll
-        command: [Quickshell.shellRoot + "/scripts/wifi-list.sh"]
+        command: [Quickshell.shellDir + "/scripts/wifi-list.sh"]
         running: true
         stdout: StdioCollector {
             onStreamFinished: {

@@ -83,14 +83,14 @@ RowLayout {
             }
 
             visible: isActive || isOccupied
-            implicitWidth: wsRow.implicitWidth + 12
+            implicitWidth: wsRow.implicitWidth + 18
             implicitHeight: Theme.barHeight - 8
-            radius: Theme.moduleRadius
+            radius: 10
             color: "transparent"
 
             border.width: isActive ? 2 : 1
-            border.color: isActive ? Theme.green
-                        : mouseArea.containsMouse ? Qt.rgba(0.655, 0.753, 0.502, 0.5)
+            border.color: isActive ? Theme.primary
+                        : mouseArea.containsMouse ? Theme.withAlpha(Theme.primary, 0.5)
                         : Theme.borderSubtle
 
             Row {
@@ -103,11 +103,11 @@ RowLayout {
                     anchors.verticalCenter: parent.verticalCenter
                     text: wsButton.wsId
                     font.family: Theme.fontFamily
-                    font.pixelSize: Theme.fontSizeLarge
+                    font.pixelSize: Theme.fontSizeNormal
                     font.bold: true
-                    color: wsButton.isActive ? Theme.fgPrimary
-                         : wsButton.isOccupied ? Theme.fgSecond
-                         : Theme.fgDimmed
+                    color: wsButton.isActive ? Theme.surfaceFg
+                         : wsButton.isOccupied ? Theme.surfaceVariantFg
+                         : Theme.outlineVariant
                 }
 
                 Repeater {
@@ -119,7 +119,7 @@ RowLayout {
                         text: root.appIcon(modelData["class"])
                         font.family: Theme.fontFamily
                         font.pixelSize: 12
-                        color: Theme.fgSecond
+                        color: Theme.surfaceVariantFg
                     }
                 }
             }

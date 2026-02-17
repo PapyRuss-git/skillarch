@@ -42,7 +42,7 @@ ColumnLayout {
 
             onClicked: {
                 btToggleDevice.command = [
-                    Quickshell.shellRoot + "/scripts/bluetooth-toggle-device.sh",
+                    Quickshell.shellDir + "/scripts/bluetooth-toggle-device.sh",
                     modelData.mac
                 ];
                 btToggleDevice.running = true;
@@ -80,7 +80,7 @@ ColumnLayout {
 
     Process {
         id: btDevicesPoll
-        command: [Quickshell.shellRoot + "/scripts/bluetooth-devices.sh"]
+        command: [Quickshell.shellDir + "/scripts/bluetooth-devices.sh"]
         running: true
         stdout: StdioCollector {
             onStreamFinished: {

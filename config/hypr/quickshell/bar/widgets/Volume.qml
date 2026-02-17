@@ -13,7 +13,7 @@ ClickableModule {
     property bool muted: sink && sink.audio ? sink.audio.muted : false
 
     text: volumeIcon + " " + percent + "%"
-    textColor: muted ? Theme.fgDimmed : Theme.fgPrimary
+    textColor: muted ? Theme.outlineVariant : Theme.surfaceFg
 
     property string volumeIcon: {
         if (muted) return "\u{f0e08}";

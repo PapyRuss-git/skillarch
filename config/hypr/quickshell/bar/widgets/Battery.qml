@@ -20,17 +20,17 @@ ModuleLabel {
 
     visible: hasBattery
     text: batteryIcon + " " + percent + "%"
-    textColor: charging ? Theme.green
-             : percent <= 20 ? Theme.red
-             : Theme.green
+    textColor: charging ? Theme.primary
+             : percent <= 20 ? Theme.error
+             : Theme.primary
 
     property string batteryIcon: {
-        if (charging) return "\u{f0085}";
+        if (charging) return "\u{f0084}";
         if (percent > 90) return "\u{f0079}";
-        if (percent > 70) return "\u{f0077}";
-        if (percent > 50) return "\u{f0074}";
-        if (percent > 30) return "\u{f0071}";
-        if (percent > 10) return "\u{f006e}";
-        return "\u{f008e}";
+        if (percent > 70) return "\u{f0080}";
+        if (percent > 50) return "\u{f007e}";
+        if (percent > 30) return "\u{f007c}";
+        if (percent > 10) return "\u{f007a}";
+        return "\u{f0083}";
     }
 }

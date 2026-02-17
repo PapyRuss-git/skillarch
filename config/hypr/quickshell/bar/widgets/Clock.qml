@@ -24,7 +24,7 @@ RowLayout {
         font.family: Theme.fontFamily
         font.pixelSize: Theme.fontSizeNormal
         font.bold: true
-        color: Theme.fgPrimary
+        color: Theme.surfaceFg
 
         MouseArea {
             anchors.fill: parent
@@ -37,7 +37,7 @@ RowLayout {
         font.family: Theme.fontFamily
         font.pixelSize: Theme.fontSizeSmall
         font.bold: true
-        color: Theme.fgSecond
+        color: Theme.surfaceVariantFg
         Layout.alignment: Qt.AlignVCenter
     }
 }

@@ -22,7 +22,7 @@ RowLayout {
         id: headerIcon
         font.family: Theme.fontFamily
         font.pixelSize: 16
-        color: Theme.fgSecond
+        color: Theme.surfaceVariantFg
     }
 
     Text {
@@ -30,7 +30,7 @@ RowLayout {
         font.family: Theme.fontFamily
         font.pixelSize: Theme.fontSizeSmall
         font.bold: true
-        color: Theme.fgSecond
+        color: Theme.surfaceVariantFg
         Layout.fillWidth: true
 
         MouseArea {
@@ -47,7 +47,7 @@ RowLayout {
         rotation: root.expanded ? 0 : -90
         font.family: Theme.fontFamily
         font.pixelSize: 14
-        color: Theme.fgDimmed
+        color: Theme.outlineVariant
 
         MouseArea {
             anchors.fill: parent
@@ -61,7 +61,7 @@ RowLayout {
         width: 40
         height: 22
         radius: 11
-        color: root.toggleOn ? Theme.green : Theme.bgFloat
+        color: root.toggleOn ? Theme.primary : Theme.surfaceContainer
 
 
         Rectangle {
@@ -70,7 +70,7 @@ RowLayout {
             radius: 8
             y: 3
             x: root.toggleOn ? parent.width - width - 3 : 3
-            color: root.toggleOn ? Theme.bgDim : Theme.fgDimmed
+            color: root.toggleOn ? Theme.surfaceDim : Theme.outlineVariant
         }
 
         MouseArea {

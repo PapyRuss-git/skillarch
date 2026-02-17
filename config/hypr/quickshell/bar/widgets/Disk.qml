@@ -11,13 +11,13 @@ ModuleLabel {
     property string diskClass: "normal"
 
     text: "\u{f02ca}  " + percent + "%"
-    textColor: diskClass === "critical" ? Theme.red
-             : diskClass === "warning" ? Theme.orange
-             : Theme.fgPrimary
+    textColor: diskClass === "critical" ? Theme.error
+             : diskClass === "warning" ? Theme.warning
+             : Theme.surfaceFg
 
     Process {
         id: diskPoll
-        command: [Quickshell.shellRoot + "/scripts/disk.sh"]
+        command: [Quickshell.shellDir + "/scripts/disk.sh"]
         running: true
         stdout: StdioCollector {
             onStreamFinished: {

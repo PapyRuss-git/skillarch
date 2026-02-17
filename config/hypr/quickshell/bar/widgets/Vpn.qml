@@ -12,7 +12,7 @@ ClickableModule {
     property string icon: "\u{f099e}"
 
     text: icon + "  " + vpnText
-    textColor: status === "connected" ? Theme.green : Theme.red
+    textColor: status === "connected" ? Theme.primary : Theme.error
 
     onClicked: vpnToggle.running = true
     onRightClicked: nmEditor.startDetached()
@@ -32,7 +32,7 @@ ClickableModule {
 
     Process {
         id: vpnPoll
-        command: [Quickshell.shellRoot + "/scripts/vpn.sh"]
+        command: [Quickshell.shellDir + "/scripts/vpn.sh"]
         running: true
         stdout: StdioCollector {
             onStreamFinished: {

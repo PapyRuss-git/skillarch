@@ -18,7 +18,7 @@ RowLayout {
         text: root.icon
         font.family: Theme.fontFamily
         font.pixelSize: 18
-        color: Theme.fgSecond
+        color: Theme.surfaceVariantFg
         Layout.preferredWidth: 24
     }
 
@@ -36,14 +36,14 @@ RowLayout {
             anchors.verticalCenter: parent.verticalCenter
             height: 6
             radius: 3
-            color: Theme.bgFloat
+            color: Theme.surfaceContainer
 
             // Fill
             Rectangle {
                 width: root.value * parent.width
                 height: parent.height
                 radius: 3
-                color: Theme.green
+                color: Theme.primary
             }
         }
 
@@ -55,7 +55,7 @@ RowLayout {
             width: 16
             height: 16
             radius: 8
-            color: dragArea.pressed ? Theme.fgPrimary : Theme.fgSecond
+            color: dragArea.pressed ? Theme.surfaceFg : Theme.surfaceVariantFg
             border.width: 1
             border.color: Theme.borderLight
         }
@@ -92,7 +92,7 @@ RowLayout {
         font.family: Theme.fontFamily
         font.pixelSize: Theme.fontSizeTiny
         font.bold: true
-        color: Theme.fgSecond
+        color: Theme.surfaceVariantFg
         Layout.preferredWidth: 36
         horizontalAlignment: Text.AlignRight
     }
