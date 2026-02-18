@@ -257,10 +257,10 @@ alias ska-hypr-wallpaper='ska-hypr wallpaper'
 alias ska-wm-info='/opt/skillarch/scripts/ska-wm-info'
 
 # Bar switching (Hyprland: Waybar <-> Quickshell)
-alias ska-bar-waybar='killall quickshell 2>/dev/null; mkdir -p ~/.config/skillarch; echo "waybar" > ~/.config/skillarch/bar-choice; waybar & echo "Switched to Waybar"'
-alias ska-bar-quickshell='killall waybar 2>/dev/null; mkdir -p ~/.config/skillarch; echo "quickshell" > ~/.config/skillarch/bar-choice; quickshell & echo "Switched to Quickshell"'
-alias ska-bar-toggle='current=$(cat ~/.config/skillarch/bar-choice 2>/dev/null || echo waybar); case "$current" in waybar) ska-bar-quickshell ;; quickshell) ska-bar-waybar ;; *) ska-bar-waybar ;; esac'
-alias ska-bar-info='echo "Current bar: $(cat ~/.config/skillarch/bar-choice 2>/dev/null || echo waybar)"'
+alias ska-bar-waybar='~/.config/hypr/scripts/start-bar.sh switch waybar'
+alias ska-bar-quickshell='~/.config/hypr/scripts/start-bar.sh switch quickshell'
+alias ska-bar-toggle='~/.config/hypr/scripts/start-bar.sh toggle'
+alias ska-bar-info='~/.config/hypr/scripts/start-bar.sh info'
 
 # ═══════════════════════════════════════════════════════════════════════════
 # WM-Specific Aliases (X11 vs Wayland)
