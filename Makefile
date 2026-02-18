@@ -15,6 +15,7 @@ include makefiles/gui-hyprland.mk
 include makefiles/gui-tools.mk
 include makefiles/security.mk
 include makefiles/update.mk
+include makefiles/test.mk
 
 help: ## Show this help message
 	@echo 'Welcome to SkillArch! 🌹'
