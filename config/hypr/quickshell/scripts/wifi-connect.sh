@@ -1,4 +1,5 @@
 #!/bin/bash
+set -o pipefail
 # wifi-connect.sh - Connect to WiFi network
 # Usage: wifi-connect.sh <SSID>
 

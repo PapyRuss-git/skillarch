@@ -1,0 +1,10 @@
+# name|url
+chisel|https://github.com/jpillora/chisel
+phpggc|https://github.com/ambionics/phpggc
+PyFuscation|https://github.com/CBHue/PyFuscation
+CloudFlair|https://github.com/christophetd/CloudFlair
+minos-static|https://github.com/minos-org/minos-static
+exploit-database|https://github.com/offensive-security/exploit-database
+exploitdb|https://gitlab.com/exploit-database/exploitdb
+pty4all|https://github.com/laluka/pty4all
+pypotomux|https://github.com/laluka/pypotomux

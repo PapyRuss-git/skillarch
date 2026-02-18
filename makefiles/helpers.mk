@@ -1,5 +1,9 @@
 # helpers.mk - sanity-check, symlink macros, clean
 
+# Central path variables
+SKA_DIR ?= /opt/skillarch
+SKA_CONFIG = $(SKA_DIR)/config
+
 # Backup existing file then symlink
 # Usage: $(call symlink,source,destination)
 define symlink
@@ -15,13 +19,12 @@ define symlink-dir
 endef
 
 sanity-check:
-	set -x
-	@# Ensure we are in /opt/skillarch or /opt/skillarch-original (maintainer only)
-	@[ "$$(pwd)" != "/opt/skillarch" ] && [ "$$(pwd)" != "/opt/skillarch-original" ] && echo "You must be in /opt/skillarch or /opt/skillarch-original to run this command" && exit 1
+	@# Ensure we are in $(SKA_DIR) or $(SKA_DIR)-original (maintainer only)
+	@[ "$$(pwd)" != "$(SKA_DIR)" ] && [ "$$(pwd)" != "$(SKA_DIR)-original" ] && echo "You must be in $(SKA_DIR) or $(SKA_DIR)-original to run this command" && exit 1
 	@sudo id || (echo "Error: sudo access is required" ; exit 1)
 
 clean: ## Clean up system and remove unnecessary files
-	[ ! -f /.dockerenv ] && exit
+	[ -f /.dockerenv ] || exit 0
 	yes|sudo pacman -Scc
 	yes|sudo pacman -Sc
 	yes|sudo pacman -Rns $$(pacman -Qtdq) 2>/dev/null || true

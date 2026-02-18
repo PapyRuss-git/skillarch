@@ -1,0 +1,11 @@
+# name|url
+PayloadsAllTheThings|https://github.com/swisskyrepo/PayloadsAllTheThings
+BruteX|https://github.com/1N3/BruteX
+IntruderPayloads|https://github.com/1N3/IntruderPayloads
+Probable-Wordlists|https://github.com/berzerk0/Probable-Wordlists
+Open-Redirect-Payloads|https://github.com/cujanovic/Open-Redirect-Payloads
+SecLists|https://github.com/danielmiessler/SecLists
+Pwdb-Public|https://github.com/ignis-sec/Pwdb-Public
+Bug-Bounty-Wordlists|https://github.com/Karanxa/Bug-Bounty-Wordlists
+richelieu|https://github.com/tarraschk/richelieu
+webapp-wordlists|https://github.com/p0dalirius/webapp-wordlists

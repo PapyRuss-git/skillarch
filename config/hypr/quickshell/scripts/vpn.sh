@@ -1,4 +1,5 @@
 #!/bin/bash
+set -o pipefail
 # vpn.sh - Output JSON VPN status (single-shot for Quickshell Process)
 export LANG=C
 

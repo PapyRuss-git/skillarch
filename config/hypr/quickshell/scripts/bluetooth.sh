@@ -1,4 +1,5 @@
 #!/bin/bash
+set -o pipefail
 # bluetooth.sh - Output JSON Bluetooth status (single-shot for Quickshell Process)
 
 if ! command -v bluetoothctl &>/dev/null; then

@@ -1,4 +1,5 @@
 #!/bin/bash
+set -o pipefail
 # bluetooth-toggle-device.sh - Toggle Bluetooth device connection
 # Usage: bluetooth-toggle-device.sh <MAC_ADDRESS>
 

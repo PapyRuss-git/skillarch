@@ -1,4 +1,5 @@
 #!/bin/bash
+set -o pipefail
 # start-bar.sh - Intelligent bar launcher for SkillArch Hyprland
 # Reads bar-choice from ~/.config/skillarch/bar-choice (default: waybar)
 

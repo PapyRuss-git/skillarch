@@ -1,4 +1,5 @@
 #!/bin/bash
+set -o pipefail
 # wifi-list.sh - Output JSON array of available WiFi networks (single-shot)
 export LANG=C
 

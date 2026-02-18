@@ -1,4 +1,6 @@
 .ONESHELL:
+SHELL = /bin/bash
+.SHELLFLAGS = -o pipefail -c
 .PHONY: help install
 
 # Include all module makefiles

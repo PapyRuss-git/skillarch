@@ -1,4 +1,5 @@
 #!/bin/bash
+set -o pipefail
 # updates.sh - Output JSON update count (single-shot)
 
 count=0

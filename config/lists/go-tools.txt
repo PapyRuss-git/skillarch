@@ -1,0 +1,4 @@
+github.com/sw33tLie/sns@latest
+github.com/glitchedgitz/cook/v2/cmd/cook@latest
+github.com/x90skysn3k/brutespray@latest
+github.com/sensepost/gowitness@latest

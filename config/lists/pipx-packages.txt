@@ -1,0 +1,9 @@
+argcomplete
+bypass-url-parser
+dirsearch
+exegol
+pre-commit
+sqlmap
+wafw00f
+yt-dlp
+semgrep

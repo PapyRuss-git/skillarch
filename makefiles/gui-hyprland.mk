@@ -28,54 +28,53 @@ install-gui-hyprland: sanity-check ## Install Hyprland compositor (Wayland)
 	# Create Hyprland config directories
 	mkdir -p ~/.config/hypr ~/.config/waybar ~/.config/dunst ~/.config/clipse ~/.config/xdg-desktop-portal
 
-	# Determine which Hyprland config to use (Desktop vs VM)
+	# Hyprland config (single source, mode-specific overrides via source)
+	$(call symlink,$(SKA_CONFIG)/hypr/hyprland.conf,~/.config/hypr/hyprland.conf)
 	@if [ "$(HYPR_MODE)" = "vm" ]; then \
-		echo "   Using Hyprland VM config (optimized, no animations/blur)"; \
-		[ -f ~/.config/hypr/hyprland.conf ] && [ ! -L ~/.config/hypr/hyprland.conf ] && mv ~/.config/hypr/hyprland.conf ~/.config/hypr/hyprland.conf.skabak; \
-		ln -sf /opt/skillarch/config/hypr/hyprland-vm.conf ~/.config/hypr/hyprland.conf; \
+		echo "   Mode: VM (optimized, no animations/blur)"; \
+		ln -sf $(SKA_CONFIG)/hypr/hyprland-vm.conf ~/.config/hypr/hyprland-mode.conf; \
 	else \
-		echo "   Using Hyprland Desktop config (animations, blur, eye candy)"; \
-		[ -f ~/.config/hypr/hyprland.conf ] && [ ! -L ~/.config/hypr/hyprland.conf ] && mv ~/.config/hypr/hyprland.conf ~/.config/hypr/hyprland.conf.skabak; \
-		ln -sf /opt/skillarch/config/hypr/hyprland.conf ~/.config/hypr/hyprland.conf; \
+		echo "   Mode: Desktop (animations, blur, eye candy)"; \
+		ln -sf $(SKA_CONFIG)/hypr/hyprland-desktop.conf ~/.config/hypr/hyprland-mode.conf; \
 	fi
 
 	# Create empty monitors.conf if it doesn't exist (sourced by hyprland.conf for custom multi-monitor setups)
 	touch ~/.config/hypr/monitors.conf
 
 	# hyprpaper config
-	$(call symlink,/opt/skillarch/config/hypr/hyprpaper.conf,~/.config/hypr/hyprpaper.conf)
+	$(call symlink,$(SKA_CONFIG)/hypr/hyprpaper.conf,~/.config/hypr/hyprpaper.conf)
 
 	# hyprsunset config
-	$(call symlink,/opt/skillarch/config/hypr/hyprsunset.conf,~/.config/hypr/hyprsunset.conf)
+	$(call symlink,$(SKA_CONFIG)/hypr/hyprsunset.conf,~/.config/hypr/hyprsunset.conf)
 
 	# hyprlock config
-	$(call symlink,/opt/skillarch/config/hypr/hyprlock.conf,~/.config/hypr/hyprlock.conf)
+	$(call symlink,$(SKA_CONFIG)/hypr/hyprlock.conf,~/.config/hypr/hyprlock.conf)
 
 	# hypridle config
-	$(call symlink,/opt/skillarch/config/hypr/hypridle.conf,~/.config/hypr/hypridle.conf)
+	$(call symlink,$(SKA_CONFIG)/hypr/hypridle.conf,~/.config/hypr/hypridle.conf)
 
 	# waybar config
-	$(call symlink,/opt/skillarch/config/hypr/waybar/config.jsonc,~/.config/waybar/config.jsonc)
-	$(call symlink,/opt/skillarch/config/hypr/waybar/style.css,~/.config/waybar/style.css)
+	$(call symlink,$(SKA_CONFIG)/hypr/waybar/config.jsonc,~/.config/waybar/config.jsonc)
+	$(call symlink,$(SKA_CONFIG)/hypr/waybar/style.css,~/.config/waybar/style.css)
 
 	# waybar scripts
-	$(call symlink-dir,/opt/skillarch/config/hypr/waybar/scripts,~/.config/waybar/scripts)
+	$(call symlink-dir,$(SKA_CONFIG)/hypr/waybar/scripts,~/.config/waybar/scripts)
 
 	# dunst config
-	$(call symlink,/opt/skillarch/config/hypr/dunst/dunstrc,~/.config/dunst/dunstrc)
+	$(call symlink,$(SKA_CONFIG)/hypr/dunst/dunstrc,~/.config/dunst/dunstrc)
 
 	# clipse configs
-	$(call symlink,/opt/skillarch/config/hypr/clipse/config.json,~/.config/clipse/config.json)
-	$(call symlink,/opt/skillarch/config/hypr/clipse/custom_theme.json,~/.config/clipse/custom_theme.json)
+	$(call symlink,$(SKA_CONFIG)/hypr/clipse/config.json,~/.config/clipse/config.json)
+	$(call symlink,$(SKA_CONFIG)/hypr/clipse/custom_theme.json,~/.config/clipse/custom_theme.json)
 
 	# xdg-desktop-portal configs
-	$(call symlink,/opt/skillarch/config/hypr/xdg-desktop-portal/hyprland.portals,~/.config/xdg-desktop-portal/hyprland.portals)
-	$(call symlink,/opt/skillarch/config/hypr/xdg-desktop-portal/portals.conf,~/.config/xdg-desktop-portal/portals.conf)
+	$(call symlink,$(SKA_CONFIG)/hypr/xdg-desktop-portal/hyprland.portals,~/.config/xdg-desktop-portal/hyprland.portals)
+	$(call symlink,$(SKA_CONFIG)/hypr/xdg-desktop-portal/portals.conf,~/.config/xdg-desktop-portal/portals.conf)
 
 	# start-bar.sh script
 	mkdir -p ~/.config/hypr/scripts
-	$(call symlink,/opt/skillarch/config/hypr/scripts/start-bar.sh,~/.config/hypr/scripts/start-bar.sh)
-	chmod +x /opt/skillarch/config/hypr/scripts/start-bar.sh
+	$(call symlink,$(SKA_CONFIG)/hypr/scripts/start-bar.sh,~/.config/hypr/scripts/start-bar.sh)
+	chmod +x $(SKA_CONFIG)/hypr/scripts/start-bar.sh
 
 	@echo "✅ Hyprland (Wayland) installed!"
 	@echo "   Compositor: Hyprland | Bar: Waybar"
@@ -102,12 +101,12 @@ install-quickshell: sanity-check ## Install Quickshell bar (Hyprland only)
 
 	# Symlink entire quickshell config directory
 	rm -rf ~/.config/quickshell
-	ln -sfn /opt/skillarch/config/hypr/quickshell ~/.config/quickshell
-	chmod +x /opt/skillarch/config/hypr/quickshell/scripts/*.sh
+	ln -sfn $(SKA_CONFIG)/hypr/quickshell ~/.config/quickshell
+	chmod +x $(SKA_CONFIG)/hypr/quickshell/scripts/*.sh
 
 	# Symlink start-bar.sh
-	$(call symlink,/opt/skillarch/config/hypr/scripts/start-bar.sh,~/.config/hypr/scripts/start-bar.sh)
-	chmod +x /opt/skillarch/config/hypr/scripts/start-bar.sh
+	$(call symlink,$(SKA_CONFIG)/hypr/scripts/start-bar.sh,~/.config/hypr/scripts/start-bar.sh)
+	chmod +x $(SKA_CONFIG)/hypr/scripts/start-bar.sh
 
 	# Set quickshell as default bar choice
 	echo "quickshell" > ~/.config/skillarch/bar-choice

@@ -35,19 +35,26 @@ install-cli-tools: sanity-check ## Install system packages
 	# eza doesn't need the libgit2 workaround that exa required
 	# nvim config
 	[ ! -d ~/.config/nvim ] && git clone --depth=1 https://github.com/LazyVim/starter ~/.config/nvim
-	$(call symlink,/opt/skillarch/config/nvim/init.lua,~/.config/nvim/init.lua)
+	$(call symlink,$(SKA_CONFIG)/nvim/init.lua,~/.config/nvim/init.lua)
+	ln -sfn $(SKA_CONFIG)/nvim/lua ~/.config/nvim/lua
 	nvim --headless +"Lazy! sync" +qa >/dev/null # Download and update plugins
 
 	# Install pipx & tools
 	yay --noconfirm --needed -S python-pipx
 	pipx ensurepath
-	for package in argcomplete bypass-url-parser dirsearch exegol pre-commit sqlmap wafw00f yt-dlp semgrep; do pipx install -q "$$package" && pipx inject -q "$$package" setuptools; done
+	while IFS= read -r package; do \
+		[ -z "$$package" ] || [ "$${package#\#}" != "$$package" ] && continue; \
+		pipx install -q "$$package" && pipx inject -q "$$package" setuptools || echo "WARNING: pipx $$package failed"; \
+	done < $(SKA_CONFIG)/lists/pipx-packages.txt
 
 	# Install mise and all php-build dependencies
 	yes|sudo pacman -S --noconfirm --needed mise libedit libffi libjpeg-turbo libpcap libpng libxml2 libzip postgresql-libs php-gd
 	# mise self-update # Currently broken, wait for upstream fix, pinged on 17/03/2025
 	for i in $$(seq 1 30); do command -v mise >/dev/null 2>&1 && break || sleep 1; done
 	command -v mise >/dev/null 2>&1 || { echo "ERROR: mise not found after install"; exit 1; }
-	for package in usage pdm rust terraform golang python nodejs; do mise use -g "$$package@latest" && mise exec -- true || { echo "ERROR: mise use $$package failed"; exit 1; }; done
+	while IFS= read -r package; do \
+		[ -z "$$package" ] || [ "$${package#\#}" != "$$package" ] && continue; \
+		mise use -g "$$package@latest" && mise exec -- true || { echo "ERROR: mise use $$package failed"; exit 1; }; \
+	done < $(SKA_CONFIG)/lists/mise-packages.txt
 	mise exec -- go env -w "GOPATH=/home/$$USER/.local/go"
 	make clean

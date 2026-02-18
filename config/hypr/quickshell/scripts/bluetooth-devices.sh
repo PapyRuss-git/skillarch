@@ -1,4 +1,5 @@
 #!/bin/bash
+set -o pipefail
 # bluetooth-devices.sh - Output JSON array of paired Bluetooth devices (single-shot)
 
 if ! command -v bluetoothctl &>/dev/null; then

@@ -1,4 +1,5 @@
 #!/bin/bash
+set -o pipefail
 # network.sh - Output JSON network status (single-shot for Quickshell Process)
 # Detects WiFi or Ethernet connection via nmcli
 # Uses LANG=C to avoid locale-dependent output (yes/oui/ja...)

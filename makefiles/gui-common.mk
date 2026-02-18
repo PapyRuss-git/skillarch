@@ -98,11 +98,11 @@ install-gui-common: sanity-check ## Install common GUI packages (X11 + Wayland c
 
 	# kitty config (common)
 	[ ! -d ~/.config/kitty ] && mkdir -p ~/.config/kitty
-	$(call symlink,/opt/skillarch/config/kitty/kitty.conf,~/.config/kitty/kitty.conf)
+	$(call symlink,$(SKA_CONFIG)/kitty/kitty.conf,~/.config/kitty/kitty.conf)
 
 	# rofi config (common)
 	[ ! -d ~/.config/rofi ] && mkdir -p ~/.config/rofi
-	$(call symlink,/opt/skillarch/config/rofi/config.rasi,~/.config/rofi/config.rasi)
+	$(call symlink,$(SKA_CONFIG)/rofi/config.rasi,~/.config/rofi/config.rasi)
 	make clean
 
 .PHONY: install-gui
