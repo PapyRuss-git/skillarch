@@ -41,6 +41,7 @@ alias ska-help-bindings='(
     fi
 ) 2>/dev/null'
 alias ska-help-aliases='alias | fzf'
+alias ska-help-tmux='tmux list-keys | sed "s/bind-key *-T */-T /;s/ *-T prefix/prefix/" | fzf --header="Tmux Bindings (prefix = C-a)" --reverse --no-sort'
 alias ska-help-packages='pacman -Q | fzf'
 alias ska-update-simple='ska && make update && make install'
 alias ska-update-advanced='echo "# SAVE your changes on your repo" ; echo "git add foo ; git commit -m i-added-foo ; git push" ; echo "# Then, from a CLEAN git state" ; echo "ska && git status" ; echo "# PULL & CHECKOUT upstream changes" ; echo "git fetch upstream && git checkout main" ; echo "# MERGE upstream changes" ; echo "git merge upstream/main" ; echo "# SAVE your new current state" ; echo "git push origin main" ; echo "# Check & Compare your current drift from upstream" ; echo "git diff upstream/main" ; echo "# Reapply with latest changes" ; echo "ska-update-simple"'

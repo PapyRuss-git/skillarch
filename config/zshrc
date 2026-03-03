@@ -80,6 +80,11 @@ ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#5C6A72"
 # Custom plugins may be added to $ZSH_CUSTOM/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
+# Tmux auto-start (new session each time, no auto-quit terminal)
+ZSH_TMUX_AUTOSTART=true
+ZSH_TMUX_AUTOCONNECT=false
+ZSH_TMUX_AUTOQUIT=false
+
 plugins=(git ssh-agent colored-man-pages docker extract fzf mise npm terraform tmux zsh-autosuggestions zsh-completions zsh-syntax-highlighting)
 
 # source $ZSH/oh-my-zsh.sh
