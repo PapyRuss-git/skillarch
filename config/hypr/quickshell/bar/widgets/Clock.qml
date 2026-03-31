@@ -15,6 +15,15 @@ RowLayout {
         precision: SystemClock.Minutes
     }
 
+    property var currentDate: new Date()
+
+    Timer {
+        interval: 60000
+        running: true
+        repeat: true
+        onTriggered: root.currentDate = new Date()
+    }
+
     Text {
         text: {
             var h = clock.hours.toString().padStart(2, '0');
@@ -33,7 +42,7 @@ RowLayout {
     }
 
     Text {
-        text: Qt.formatDate(new Date(), "ddd dd MMM")
+        text: Qt.formatDate(root.currentDate, "ddd dd MMM")
         font.family: Theme.fontFamily
         font.pixelSize: Theme.fontSizeSmall
         font.bold: true
