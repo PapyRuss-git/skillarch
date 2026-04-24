@@ -2,8 +2,8 @@
 
 # Window Manager Choice Variables (persisted in ~/.config/skillarch/)
 SKA_CONFIG_DIR := $(HOME)/.config/skillarch
-WM_CHOICE := $(shell cat $(HOME)/.config/skillarch/wm-choice 2>/dev/null || echo "")
-HYPR_MODE := $(shell cat $(HOME)/.config/skillarch/hypr-mode 2>/dev/null || echo "desktop")
+WM_CHOICE = $(shell cat $(HOME)/.config/skillarch/wm-choice 2>/dev/null || echo "")
+HYPR_MODE = $(shell cat $(HOME)/.config/skillarch/hypr-mode 2>/dev/null || echo "desktop")
 
 .PHONY: validate-wm-choice
 validate-wm-choice: ## Validate that WM_CHOICE is set correctly
@@ -13,6 +13,10 @@ validate-wm-choice: ## Validate that WM_CHOICE is set correctly
 	fi
 	@if [ "$(WM_CHOICE)" != "i3" ] && [ "$(WM_CHOICE)" != "hyprland" ]; then \
 		echo "❌ ERROR: Invalid WM_CHOICE '$(WM_CHOICE)'. Must be 'i3' or 'hyprland'."; \
+		exit 1; \
+	fi
+	@if [ "$(WM_CHOICE)" = "hyprland" ] && [ "$(HYPR_MODE)" != "desktop" ] && [ "$(HYPR_MODE)" != "vm" ]; then \
+		echo "❌ ERROR: Invalid HYPR_MODE '$(HYPR_MODE)'. Must be 'desktop' or 'vm'."; \
 		exit 1; \
 	fi
 	@echo "✅ WM_CHOICE validated: $(WM_CHOICE)"
