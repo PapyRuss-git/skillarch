@@ -4,7 +4,7 @@
 install-gui-common: sanity-check ## Install common GUI packages (X11 + Wayland compatible)
 	# Common terminal & fonts
 	yes|sudo pacman -S --noconfirm --needed \
-		kitty \
+		kitty ghostty \
 		ttf-dejavu ttf-liberation noto-fonts noto-fonts-emoji \
 		ttf-jetbrains-mono-nerd ttf-firacode-nerd ttf-meslo-nerd
 
@@ -99,6 +99,10 @@ install-gui-common: sanity-check ## Install common GUI packages (X11 + Wayland c
 	# kitty config (common)
 	[ ! -d ~/.config/kitty ] && mkdir -p ~/.config/kitty
 	$(call symlink,$(SKA_CONFIG)/kitty/kitty.conf,~/.config/kitty/kitty.conf)
+
+	# ghostty config (common)
+	[ ! -d ~/.config/ghostty ] && mkdir -p ~/.config/ghostty
+	$(call symlink,$(SKA_CONFIG)/ghostty/config,~/.config/ghostty/config)
 
 	# rofi config (common)
 	[ ! -d ~/.config/rofi ] && mkdir -p ~/.config/rofi

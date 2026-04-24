@@ -14,10 +14,10 @@ install-gui-hyprland: sanity-check ## Install Hyprland compositor (Wayland)
 
 	# Wayland utilities
 	yes|sudo pacman -S --noconfirm --needed \
-		dunst grim slurp wl-clipboard clipse wlr-randr
+		swaync grim slurp wl-clipboard clipse wlr-randr
 
 	# Wayland support for Qt apps
-	yes|sudo pacman -S --noconfirm --needed qt5-wayland qt6-wayland hyprland-qt-support
+	yes|sudo pacman -S --noconfirm --needed qt5-wayland qt6-wayland qt6ct hyprland-qt-support
 
 	# Audio (PipeWire + WirePlumber)
 	yes|sudo pacman -S --noconfirm --needed pipewire wireplumber pipewire-pulse pipewire-alsa
@@ -26,10 +26,11 @@ install-gui-hyprland: sanity-check ## Install Hyprland compositor (Wayland)
 	yay --noconfirm --needed -S hyprpolkitagent wlogout
 
 	# Create Hyprland config directories
-	mkdir -p ~/.config/hypr ~/.config/waybar ~/.config/dunst ~/.config/clipse ~/.config/xdg-desktop-portal
+	mkdir -p ~/.config/hypr ~/.config/waybar ~/.config/swaync ~/.config/clipse ~/.config/xdg-desktop-portal ~/.config/qt6ct/colors
 
 	# Hyprland config (single source, mode-specific overrides via source)
 	$(call symlink,$(SKA_CONFIG)/hypr/hyprland.conf,~/.config/hypr/hyprland.conf)
+	$(call symlink,$(SKA_CONFIG)/hypr/application-style.conf,~/.config/hypr/application-style.conf)
 	@if [ "$(HYPR_MODE)" = "vm" ]; then \
 		echo "   Mode: VM (optimized, no animations/blur)"; \
 		ln -sf $(SKA_CONFIG)/hypr/hyprland-vm.conf ~/.config/hypr/hyprland-mode.conf; \
@@ -60,12 +61,17 @@ install-gui-hyprland: sanity-check ## Install Hyprland compositor (Wayland)
 	# waybar scripts
 	$(call symlink-dir,$(SKA_CONFIG)/hypr/waybar/scripts,~/.config/waybar/scripts)
 
-	# dunst config
-	$(call symlink,$(SKA_CONFIG)/hypr/dunst/dunstrc,~/.config/dunst/dunstrc)
+	# swaync config
+	$(call symlink,$(SKA_CONFIG)/hypr/swaync/config.json,~/.config/swaync/config.json)
+	$(call symlink,$(SKA_CONFIG)/hypr/swaync/style.css,~/.config/swaync/style.css)
 
 	# clipse configs
 	$(call symlink,$(SKA_CONFIG)/hypr/clipse/config.json,~/.config/clipse/config.json)
 	$(call symlink,$(SKA_CONFIG)/hypr/clipse/custom_theme.json,~/.config/clipse/custom_theme.json)
+
+	# qt6ct config
+	$(call symlink,$(SKA_DIR)/config/qt6ct/qt6ct.conf,~/.config/qt6ct/qt6ct.conf)
+	$(call symlink,$(SKA_DIR)/config/qt6ct/colors/everforest-hard.conf,~/.config/qt6ct/colors/everforest-hard.conf)
 
 	# xdg-desktop-portal configs
 	$(call symlink,$(SKA_CONFIG)/hypr/xdg-desktop-portal/hyprland.portals,~/.config/xdg-desktop-portal/hyprland.portals)
@@ -77,7 +83,9 @@ install-gui-hyprland: sanity-check ## Install Hyprland compositor (Wayland)
 	chmod +x $(SKA_CONFIG)/hypr/scripts/start-bar.sh
 
 	@echo "✅ Hyprland (Wayland) installed!"
-	@echo "   Compositor: Hyprland | Bar: Waybar"
+	@echo "   Compositor: Hyprland | Bar: Waybar (default)"
+	@echo "   Notifications: Swaync"
+	@echo "   Optional bar: Quickshell via 'make install-quickshell'"
 	@echo "   Screenshots: Grim+Slurp | Lock: Hyprlock | Idle: Hypridle"
 	@if [ "$(HYPR_MODE)" = "vm" ]; then \
 		echo "   Mode: VM (optimized for VirtualBox/VMware)"; \
@@ -114,6 +122,7 @@ install-quickshell: sanity-check ## Install Quickshell bar (Hyprland only)
 	@echo ""
 	@echo "✅ Quickshell bar installed!"
 	@echo "   Bar: Quickshell (Everforest) | Watermark: Activate Linux"
+	@echo "   Persists choice in ~/.config/skillarch/bar-choice"
 	@echo "   Toggle: ska-bar-toggle (cycle waybar <-> quickshell)"
 	@echo "   Manual: quickshell"
 	@echo "   Stop:   killall quickshell"
