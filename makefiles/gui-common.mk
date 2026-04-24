@@ -118,6 +118,7 @@ install-gui: sanity-check validate-wm-choice install-gui-common ## Install GUI e
 		$(MAKE) install-gui-i3; \
 	elif [ "$(WM_CHOICE)" = "hyprland" ]; then \
 		$(MAKE) install-gui-hyprland; \
+		$(MAKE) install-quickshell; \
 	fi
 	@echo ""
 	@echo "✅ GUI installation complete!"

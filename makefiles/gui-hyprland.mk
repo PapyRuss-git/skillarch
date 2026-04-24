@@ -83,9 +83,9 @@ install-gui-hyprland: sanity-check ## Install Hyprland compositor (Wayland)
 	chmod +x $(SKA_CONFIG)/hypr/scripts/start-bar.sh
 
 	@echo "✅ Hyprland (Wayland) installed!"
-	@echo "   Compositor: Hyprland | Bar: Waybar (default)"
+	@echo "   Compositor: Hyprland | Bar: Quickshell (default)"
 	@echo "   Notifications: Swaync"
-	@echo "   Optional bar: Quickshell via 'make install-quickshell'"
+	@echo "   Alternative bar: Waybar (toggle via 'ska-bar-toggle')"
 	@echo "   Screenshots: Grim+Slurp | Lock: Hyprlock | Idle: Hypridle"
 	@if [ "$(HYPR_MODE)" = "vm" ]; then \
 		echo "   Mode: VM (optimized for VirtualBox/VMware)"; \

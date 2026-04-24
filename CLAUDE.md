@@ -8,7 +8,7 @@ SkillArch is a Linux penetration testing and cybersecurity distribution built on
 - **i3-gaps** (X11) - Stable, mature, widely supported
 - **Hyprland** (Wayland) - Modern, smooth animations, cutting-edge
 
-> **Note:** Currently both environments are installed. A future update will allow choosing one at installation time to avoid package conflicts.
+> **Note:** `make install` now persists a WM choice in `~/.config/skillarch/wm-choice`. Hyprland uses Quickshell as the default bar (installed automatically); Waybar is also installed as an alternative and can be selected via `ska-bar-toggle`.
 
 ## Key Commands
 
@@ -24,8 +24,8 @@ SkillArch is a Linux penetration testing and cybersecurity distribution built on
 - `make install-cli-tools` - Install CLI tools and development environment
 - `make install-shell` - Install zsh, oh-my-zsh, and shell configuration
 - `make install-docker` - Install and configure Docker
-- `make install-gui` - Install i3, polybar, kitty, rofi, and GUI components
-- `make install-quickshell` - Install Quickshell bar (C++/Qt6/QML alternative, lowest CPU usage)
+- `make install-gui` - Install GUI components for the currently selected WM
+- `make install-quickshell` - Install Quickshell bar (installed by default on Hyprland; run standalone to reinstall)
 - `make install-gui-tools` - Install GUI applications
 - `make install-offensive` - Install penetration testing tools
 - `make install-wordlists` - Install security wordlists
@@ -46,7 +46,7 @@ SkillArch is a Linux penetration testing and cybersecurity distribution built on
 - `ska-help-bindings` - Fuzzy search through WM key bindings (i3 or Hyprland)
 - `ska-help-packages` - Fuzzy search through installed packages
 - `ska-sudo-unlock` - Unlock user after failed sudo attempts
-- `ska-wm-info` - Display current window manager info (planned)
+- `ska-wm-info` - Display current window manager info
 - `ska-bar-waybar` - Switch to Waybar (Hyprland)
 - `ska-bar-quickshell` - Switch to Quickshell bar (Hyprland)
 - `ska-bar-toggle` - Cycle between Waybar and Quickshell
@@ -97,9 +97,9 @@ Centralized configuration with atomic symlink operations from `/opt/skillarch/co
 - `config/hypr/hypridle.conf` → `~/.config/hypr/hypridle.conf`
 - `config/hypr/hyprpaper.conf` → `~/.config/hypr/hyprpaper.conf`
 - `config/hypr/waybar/` → `~/.config/waybar/`
-- `config/hypr/quickshell/` → `~/.config/quickshell/` (C++/Qt6/QML bar, install via `make install-quickshell`)
+- `config/hypr/quickshell/` → `~/.config/quickshell/` (C++/Qt6/QML bar, installed by default on Hyprland)
 - `config/hypr/scripts/` → `~/.config/hypr/scripts/` (bar launcher, etc.)
-- `config/hypr/dunst/` → `~/.config/dunst/`
+- `config/hypr/swaync/` → `~/.config/swaync/`
 - `config/hypr/clipse/` → `~/.config/clipse/`
 - `config/hypr/xdg-desktop-portal/` → `~/.config/xdg-desktop-portal/`
 
@@ -149,7 +149,7 @@ Each full-* image sets the WM choice via `~/.config/skillarch/wm-choice` before 
 
 ### Multi-Desktop Environment Support
 
-SkillArch supports two distinct window manager setups. Currently both are installed; future versions will offer a choice at installation.
+SkillArch supports two distinct window manager setups selected at install time via `WM_CHOICE`.
 
 **i3-gaps (X11 Stack)**
 - **Terminal**: Kitty with Everforest theme
@@ -164,7 +164,7 @@ SkillArch supports two distinct window manager setups. Currently both are instal
 **Hyprland (Wayland Stack)**
 - **Terminal**: Kitty with Everforest theme
 - **Compositor**: Hyprland with GNOME coexistence
-- **Status Bar**: Waybar (default) or Quickshell (C++/Qt6/QML, `make install-quickshell`)
+- **Status Bar**: Quickshell (default, C++/Qt6/QML) or Waybar (both installed; toggle via `ska-bar-toggle`)
 - **Launcher**: Rofi (Wayland mode)
 - **Notifications**: Dunst
 - **Background**: Hyprpaper
@@ -222,7 +222,7 @@ SkillArch supports two distinct window manager setups. Currently both are instal
 ### Configuration Files
 - Main aliases: `config/aliases`
 - **i3 configuration**: `config/i3/config`, `config/polybar/`, `config/picom.conf`, `config/xorg.conf.d/`
-- **Hyprland configuration**: `config/hypr/` (contains hyprland.conf, hyprland-vm.conf, hyprlock.conf, hypridle.conf, hyprpaper.conf, waybar/, dunst/, clipse/, xdg-desktop-portal/)
+- **Hyprland configuration**: `config/hypr/` (contains hyprland.conf, hyprland-vm.conf, hyprlock.conf, hypridle.conf, hyprpaper.conf, waybar/, swaync/, clipse/, xdg-desktop-portal/)
 - **Common configs**: `config/kitty/`, `config/rofi/`, `config/nvim/`, `config/zshrc`, `config/vimrc`, `config/tmux.conf`
 - VSCode extensions: `config/extensions.txt`
 - Chrome extensions list: `config/chrome-extensions.lst`
