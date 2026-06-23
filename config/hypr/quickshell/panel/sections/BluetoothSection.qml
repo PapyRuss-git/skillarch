@@ -25,27 +25,41 @@ ColumnLayout {
         onExpandToggled: root.expanded = !root.expanded
     }
 
-    Repeater {
-        model: root.expanded ? root.devices : []
+    Item {
+        Layout.fillWidth: true
+        implicitHeight: root.expanded ? devicesColumn.childrenRect.height : 0
+        height: implicitHeight
+        clip: true
 
-        delegate: DeviceItem {
-            required property var modelData
+        Column {
+            id: devicesColumn
+            anchors.left: parent.left
+            anchors.right: parent.right
+            spacing: 6
 
-            icon: modelData.icon || "\u{f00af}"
-            name: modelData.name || "Unknown"
-            detail: (modelData.connected ? "Connected" : "Disconnected") +
-                    (modelData.battery ? "  \u{f0079} " + modelData.battery + "%" : "")
-            badge: modelData.connected ? "\u{f012c}" : ""
-            connected: modelData.connected || false
+            Repeater {
+                model: root.devices
 
-            Layout.fillWidth: true
+                delegate: DeviceItem {
+                    required property var modelData
 
-            onClicked: {
-                btToggleDevice.command = [
-                    Quickshell.shellDir + "/scripts/bluetooth-toggle-device.sh",
-                    modelData.mac
-                ];
-                btToggleDevice.running = true;
+                    icon: modelData.icon || "\u{f00af}"
+                    name: modelData.name || "Unknown"
+                    detail: (modelData.connected ? "Connected" : "Disconnected") +
+                            (modelData.battery ? "  \u{f0079} " + modelData.battery + "%" : "")
+                    badge: modelData.connected ? "\u{f012c}" : ""
+                    connected: modelData.connected || false
+
+                    width: devicesColumn.width
+
+                    onClicked: {
+                        btToggleDevice.command = [
+                            Quickshell.shellDir + "/scripts/bluetooth-toggle-device.sh",
+                            modelData.mac
+                        ];
+                        btToggleDevice.running = true;
+                    }
+                }
             }
         }
     }

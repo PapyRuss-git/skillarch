@@ -109,6 +109,7 @@ PanelWindow {
                     Battery {}
                     SystemGroup {}
                     Updates {}
+                    Notifications {}
                 }
             }
         }

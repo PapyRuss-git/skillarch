@@ -2,6 +2,9 @@ local function set_transparency()
   vim.cmd([[
     hi Normal guibg=NONE ctermbg=NONE
     hi NormalNC guibg=NONE ctermbg=NONE
+    hi NormalFloat guibg=NONE ctermbg=NONE
+    hi FloatBorder guibg=NONE ctermbg=NONE
+    hi FloatTitle guibg=NONE ctermbg=NONE
     hi SignColumn guibg=NONE ctermbg=NONE
     hi StatusLine guibg=NONE ctermbg=NONE
     hi StatusLineNC guibg=NONE ctermbg=NONE
@@ -13,6 +16,9 @@ local function set_transparency()
     hi NeoTreeNormalNC guibg=NONE ctermbg=NONE
     hi NeoTreeWinSeparator guibg=NONE ctermbg=NONE
     hi NeoTreeEndOfBuffer guibg=NONE ctermbg=NONE
+    hi LspSignatureFloat guibg=NONE ctermbg=NONE
+    hi LspSignatureBorder guibg=NONE ctermbg=NONE
+    hi LspSignatureTitle guibg=NONE ctermbg=NONE
     hi EndOfBuffer guibg=NONE ctermbg=NONE
   ]])
 end

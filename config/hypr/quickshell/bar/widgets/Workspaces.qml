@@ -12,39 +12,62 @@ RowLayout {
     property var screen
     spacing: 2
 
-    function appIcon(cls) {
-        var c = (cls || "").toLowerCase();
-        if (c === "kitty" || c === "alacritty" || c === "foot" || c === "wezterm")
-            return "\u{f0489}";      // terminal
-        if (c === "firefox" || c === "zen" || c === "chromium" || c === "google-chrome" || c === "brave-browser" || c === "vivaldi")
-            return "\u{f0239}";      // web
-        if (c === "discord")
-            return "\u{f066f}";      // discord
-        if (c === "obsidian")
-            return "\u{f0219}";      // note
-        if (c === "code" || c === "code-oss" || c === "vscodium")
-            return "\u{f0a1e}";      // vscode
-        if (c === "nautilus" || c === "thunar" || c === "dolphin" || c === "pcmanfm")
-            return "\u{f024b}";      // folder
-        if (c === "spotify")
-            return "\u{f0cc7}";      // music
-        if (c === "steam")
-            return "\u{f0bae}";      // gamepad
-        if (c === "gimp" || c === "inkscape" || c === "krita")
-            return "\u{f006e}";      // palette
-        if (c === "vlc" || c === "mpv")
-            return "\u{f040a}";      // play
-        if (c === "thunderbird" || c === "geary")
-            return "\u{f01ee}";      // email
-        if (c === "slack")
-            return "\u{f04b1}";      // slack
-        if (c === "telegram-desktop" || c === "telegramdesktop")
-            return "\u{f0e97}";      // telegram
-        if (c === "signal")
-            return "\u{f1507}";      // signal
-        if (c === "burpsuite" || c === "wireshark" || c === "ghidra")
-            return "\u{f0483}";      // security
-        return "\u{f0beb}";          // generic window
+    function pushLookupCandidate(list, candidate) {
+        var value = (candidate || "").toString().trim();
+        if (value === "") return;
+        if (list.indexOf(value) === -1) list.push(value);
+    }
+
+    function addLookupVariants(list, candidate) {
+        var value = (candidate || "").toString().trim();
+        if (value === "") return;
+
+        root.pushLookupCandidate(list, value);
+
+        var lower = value.toLowerCase();
+        root.pushLookupCandidate(list, lower);
+
+        if (lower.length > 8 && lower.slice(lower.length - 8) === ".desktop")
+            root.pushLookupCandidate(list, lower.slice(0, lower.length - 8));
+    }
+
+    function desktopEntryForWindow(windowData) {
+        if (!windowData) return null;
+
+        var candidates = [];
+        root.addLookupVariants(candidates, windowData["class"]);
+        root.addLookupVariants(candidates, windowData.initialClass);
+
+        for (var i = 0; i < candidates.length; i++) {
+            var entry = DesktopEntries.heuristicLookup(candidates[i]);
+            if (entry && entry.icon) return entry;
+        }
+
+        return null;
+    }
+
+    function workspaceAppIcons(windows) {
+        var icons = [];
+        var seen = {};
+
+        for (var i = 0; i < windows.length; i++) {
+            var entry = root.desktopEntryForWindow(windows[i]);
+            if (!entry || !entry.icon) continue;
+
+            var iconSource = Quickshell.iconPath(entry.icon, "application-x-executable");
+            if (!iconSource) continue;
+
+            var key = entry.id || entry.icon;
+            if (seen[key]) continue;
+
+            seen[key] = true;
+            icons.push({
+                key: key,
+                source: iconSource
+            });
+        }
+
+        return icons;
     }
 
     Repeater {
@@ -56,19 +79,42 @@ RowLayout {
 
             property int wsId: index + 1
             property var hyprMonitor: root.screen ? Hyprland.monitorFor(root.screen) : null
-            property bool isActive: {
-                if (!hyprMonitor) return false;
-                var focused = hyprMonitor.activeWorkspace;
-                return focused && focused.id === wsId;
-            }
-            property bool isOccupied: {
+            property var workspaceData: {
                 for (var i = 0; i < Hyprland.workspaces.values.length; i++) {
                     var ws = Hyprland.workspaces.values[i];
-                    if (ws.id === wsId) return true;
+                    if (ws.id === wsId) return ws;
                 }
-                return false;
+                return null;
             }
+            property bool isHostedOnMonitor: {
+                if (!hyprMonitor || !workspaceData) return false;
 
+                var workspaceMonitorId = workspaceData.monitorID;
+                if (workspaceMonitorId === undefined)
+                    workspaceMonitorId = workspaceData.monitorId;
+                if (workspaceMonitorId === undefined && workspaceData.lastIpcObject)
+                    workspaceMonitorId = workspaceData.lastIpcObject.monitorID;
+                if (workspaceMonitorId !== undefined && workspaceMonitorId === hyprMonitor.id)
+                    return true;
+
+                var workspaceMonitorName = workspaceData.monitor;
+                if ((workspaceMonitorName === undefined || workspaceMonitorName === null) &&
+                    workspaceData.lastIpcObject)
+                    workspaceMonitorName = workspaceData.lastIpcObject.monitor;
+
+                var hyprMonitorName = hyprMonitor.name;
+                if ((hyprMonitorName === undefined || hyprMonitorName === null) &&
+                    hyprMonitor.lastIpcObject)
+                    hyprMonitorName = hyprMonitor.lastIpcObject.name;
+
+                return !!hyprMonitorName && workspaceMonitorName === hyprMonitorName;
+            }
+            property bool isActive: {
+                var focusedMonitor = Hyprland.focusedMonitor;
+                if (!focusedMonitor) return false;
+                var focusedWorkspace = focusedMonitor.activeWorkspace;
+                return focusedWorkspace && focusedWorkspace.id === wsId;
+            }
             property var wsWindows: {
                 if (!GlobalStates.showWorkspaceIcons) return [];
                 var result = [];
@@ -81,12 +127,16 @@ RowLayout {
                 }
                 return result;
             }
+            property var wsAppIcons: root.workspaceAppIcons(wsWindows)
+            property var visibleAppIcons: wsAppIcons.slice(0, 3)
+            property int hiddenAppCount: Math.max(0, wsAppIcons.length - visibleAppIcons.length)
 
-            visible: isActive || isOccupied
+            visible: isHostedOnMonitor
             implicitWidth: wsRow.implicitWidth + 18
             implicitHeight: Theme.barHeight - 8
             radius: 10
-            color: "transparent"
+            color: wsButton.isActive ? Theme.primaryContainer
+                   : Theme.surfaceDim
 
             border.width: isActive ? 2 : 1
             border.color: isActive ? Theme.primary
@@ -105,22 +155,49 @@ RowLayout {
                     font.family: Theme.fontFamily
                     font.pixelSize: Theme.fontSizeNormal
                     font.bold: true
-                    color: wsButton.isActive ? Theme.surfaceFg
-                         : wsButton.isOccupied ? Theme.surfaceVariantFg
-                         : Theme.outlineVariant
+                    color: wsButton.isActive ? Theme.primaryContainerFg
+                         : Theme.surfaceFg
                 }
 
                 Repeater {
-                    model: GlobalStates.showWorkspaceIcons ? wsButton.wsWindows : []
+                    model: GlobalStates.showWorkspaceIcons ? wsButton.visibleAppIcons : []
 
-                    delegate: Text {
+                    delegate: Image {
                         required property var modelData
                         anchors.verticalCenter: parent.verticalCenter
-                        text: root.appIcon(modelData["class"])
-                        font.family: Theme.fontFamily
-                        font.pixelSize: 12
-                        color: Theme.surfaceVariantFg
+                        width: 14
+                        height: 14
+                        source: modelData.source
+                        fillMode: Image.PreserveAspectFit
+                        sourceSize.width: 28
+                        sourceSize.height: 28
+                        asynchronous: true
+                        mipmap: true
                     }
+                }
+
+                Text {
+                    visible: GlobalStates.showWorkspaceIcons && wsButton.hiddenAppCount > 0
+                    anchors.verticalCenter: parent.verticalCenter
+                    text: "+" + wsButton.hiddenAppCount
+                    font.family: Theme.fontFamily
+                    font.pixelSize: Theme.fontSizeSmall
+                    font.bold: true
+                    color: wsButton.isActive ? Theme.primaryContainerFg
+                         : Theme.surfaceVariantFg
+                }
+
+                Text {
+                    visible: GlobalStates.showWorkspaceIcons
+                             && wsButton.wsWindows.length > 0
+                             && wsButton.wsAppIcons.length === 0
+                    anchors.verticalCenter: parent.verticalCenter
+                    text: "?"
+                    font.family: Theme.fontFamily
+                    font.pixelSize: Theme.fontSizeSmall
+                    font.bold: true
+                    color: wsButton.isActive ? Theme.primaryContainerFg
+                         : Theme.surfaceVariantFg
                 }
             }
 

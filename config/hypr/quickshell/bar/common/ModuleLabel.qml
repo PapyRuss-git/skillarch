@@ -9,7 +9,7 @@ Rectangle {
     property alias textColor: label.color
     property bool hovered: false
 
-    implicitWidth: label.implicitWidth + 6
+    implicitWidth: label.implicitWidth + 10
     implicitHeight: Theme.barHeight - 8
 
     radius: Theme.moduleRadius

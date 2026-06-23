@@ -25,29 +25,43 @@ ColumnLayout {
         onExpandToggled: root.expanded = !root.expanded
     }
 
-    Repeater {
-        model: root.expanded ? root.networks : []
+    Item {
+        Layout.fillWidth: true
+        implicitHeight: root.expanded ? networksColumn.childrenRect.height : 0
+        height: implicitHeight
+        clip: true
 
-        delegate: DeviceItem {
-            required property var modelData
+        Column {
+            id: networksColumn
+            anchors.left: parent.left
+            anchors.right: parent.right
+            spacing: 6
 
-            icon: modelData.icon || "\u{f0928}"
-            name: modelData.ssid || "Unknown"
-            detail: (modelData.signal || 0) + "%" +
-                    (modelData.security && modelData.security !== "--" && modelData.security !== "Open"
-                        ? "  \u{f0332}  " + modelData.security
-                        : "  Open")
-            badge: modelData.connected ? "\u{f012c}" : (modelData.known ? "\u{f006f}" : "")
-            connected: modelData.connected || false
+            Repeater {
+                model: root.networks
 
-            Layout.fillWidth: true
+                delegate: DeviceItem {
+                    required property var modelData
 
-            onClicked: {
-                wifiConnect.command = [
-                    Quickshell.shellDir + "/scripts/wifi-connect.sh",
-                    modelData.ssid
-                ];
-                wifiConnect.running = true;
+                    icon: modelData.icon || "\u{f0928}"
+                    name: modelData.ssid || "Unknown"
+                    detail: (modelData.signal || 0) + "%" +
+                            (modelData.security && modelData.security !== "--" && modelData.security !== "Open"
+                                ? "  \u{f0332}  " + modelData.security
+                                : "  Open")
+                    badge: modelData.connected ? "\u{f012c}" : (modelData.known ? "\u{f006f}" : "")
+                    connected: modelData.connected || false
+
+                    width: networksColumn.width
+
+                    onClicked: {
+                        wifiConnect.command = [
+                            Quickshell.shellDir + "/scripts/wifi-connect.sh",
+                            modelData.ssid
+                        ];
+                        wifiConnect.running = true;
+                    }
+                }
             }
         }
     }

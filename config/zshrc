@@ -80,10 +80,10 @@ ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#5C6A72"
 # Custom plugins may be added to $ZSH_CUSTOM/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-# Tmux auto-start (new session each time, no auto-quit terminal)
+# Tmux auto-start and close the parent shell when tmux exits
 ZSH_TMUX_AUTOSTART=true
 ZSH_TMUX_AUTOCONNECT=false
-ZSH_TMUX_AUTOQUIT=false
+ZSH_TMUX_AUTOQUIT=true
 
 plugins=(git ssh-agent colored-man-pages docker extract fzf mise npm terraform tmux zsh-autosuggestions zsh-completions zsh-syntax-highlighting)
 
@@ -130,6 +130,10 @@ eval "$(register-python-argcomplete --no-defaults exegol)"
 
 # Created by `pipx` on 2025-03-03 15:05:01
 export PATH=$PATH:~/.local/bin
+
+# curllm shim dir — prepended so `curl` resolves to the shim first.
+# Contains only the curllm→curl wrapper, no risk of shadowing system bins.
+export PATH=~/.curllm-shim:$PATH
 export PATH=$PATH:~/.pdtm/go/bin
 
 # Initialize Starship prompt
@@ -143,3 +147,16 @@ case ":$PATH:" in
   *) export PATH="$PNPM_HOME:$PATH" ;;
 esac
 # pnpm end
+source ~/export-esp.sh
+
+# === PapyTour (192.168.1.11 - GPU AMD, IA locale) ===
+alias pt='ssh papytour'                                      # connexion shell
+alias pt-up='ping -c1 -W2 192.168.1.11 >/dev/null 2>&1 && echo "PapyTour UP" || echo "PapyTour DOWN"'
+alias pt-gpu='ssh papytour "(command -v rocm-smi >/dev/null && rocm-smi) || (command -v nvidia-smi >/dev/null && nvidia-smi) || lspci | grep -iE \"vga|3d|display\""'
+# copier vers/depuis : ptput <local> <distant> | ptget <distant> <local>
+ptput(){ scp -r "$1" papytour:"${2:-~}"; }
+ptget(){ scp -r papytour:"$1" "${2:-.}"; }
+# tunnel ports IA : ptfwd 8080 -> llama-server Argos | 11434 Ollama | 8788 Argos web UI
+ptfwd(){ ssh -N -L "${1:-8080}:localhost:${1:-8080}" papytour; }
+# démarre le worker LLM local d'Argos (Qwen 3.6) sur la PapyTour ; arg optionnel = ctx-size
+pt-llama(){ ssh -t papytour "./start-llama.sh ${1:-}"; }

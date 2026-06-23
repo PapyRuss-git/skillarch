@@ -1,4 +1,13 @@
 set mouse=""
 set number
 set paste
+if has('termguicolors')
+  set termguicolors
+endif
+
+set background=dark
+let g:everforest_background = 'hard'
+let g:everforest_better_performance = 1
+set runtimepath+=~/.local/share/nvim/lazy/everforest
 syntax on
+colorscheme everforest

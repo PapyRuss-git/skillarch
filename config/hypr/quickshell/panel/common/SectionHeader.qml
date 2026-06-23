@@ -57,20 +57,41 @@ RowLayout {
     }
 
     Rectangle {
+        id: toggleTrack
         visible: root.showToggle
         width: 40
         height: 22
         radius: 11
         color: root.toggleOn ? Theme.primary : Theme.surfaceContainer
 
+        Behavior on color {
+            ColorAnimation {
+                duration: 140
+            }
+        }
+
 
         Rectangle {
+            id: toggleThumb
             width: 16
             height: 16
             radius: 8
             y: 3
             x: root.toggleOn ? parent.width - width - 3 : 3
             color: root.toggleOn ? Theme.surfaceDim : Theme.outlineVariant
+
+            Behavior on x {
+                NumberAnimation {
+                    duration: 140
+                    easing.type: Easing.OutCubic
+                }
+            }
+
+            Behavior on color {
+                ColorAnimation {
+                    duration: 140
+                }
+            }
         }
 
         MouseArea {
