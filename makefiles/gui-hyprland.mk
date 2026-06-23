@@ -77,10 +77,12 @@ install-gui-hyprland: sanity-check ## Install Hyprland compositor (Wayland)
 	$(call symlink,$(SKA_CONFIG)/hypr/xdg-desktop-portal/hyprland.portals,~/.config/xdg-desktop-portal/hyprland.portals)
 	$(call symlink,$(SKA_CONFIG)/hypr/xdg-desktop-portal/portals.conf,~/.config/xdg-desktop-portal/portals.conf)
 
-	# start-bar.sh script
+	# Hyprland helper scripts
 	mkdir -p ~/.config/hypr/scripts
 	$(call symlink,$(SKA_CONFIG)/hypr/scripts/start-bar.sh,~/.config/hypr/scripts/start-bar.sh)
+	$(call symlink,$(SKA_CONFIG)/hypr/scripts/wallpaper-rotate.sh,~/.config/hypr/scripts/wallpaper-rotate.sh)
 	chmod +x $(SKA_CONFIG)/hypr/scripts/start-bar.sh
+	chmod +x $(SKA_CONFIG)/hypr/scripts/wallpaper-rotate.sh
 
 	@echo "✅ Hyprland (Wayland) installed!"
 	@echo "   Compositor: Hyprland | Bar: Quickshell (default)"
@@ -112,9 +114,11 @@ install-quickshell: sanity-check ## Install Quickshell bar (Hyprland only)
 	ln -sfn $(SKA_CONFIG)/hypr/quickshell ~/.config/quickshell
 	chmod +x $(SKA_CONFIG)/hypr/quickshell/scripts/*.sh
 
-	# Symlink start-bar.sh
+	# Symlink Hyprland helper scripts
 	$(call symlink,$(SKA_CONFIG)/hypr/scripts/start-bar.sh,~/.config/hypr/scripts/start-bar.sh)
+	$(call symlink,$(SKA_CONFIG)/hypr/scripts/wallpaper-rotate.sh,~/.config/hypr/scripts/wallpaper-rotate.sh)
 	chmod +x $(SKA_CONFIG)/hypr/scripts/start-bar.sh
+	chmod +x $(SKA_CONFIG)/hypr/scripts/wallpaper-rotate.sh
 
 	# Set quickshell as default bar choice
 	echo "quickshell" > ~/.config/skillarch/bar-choice

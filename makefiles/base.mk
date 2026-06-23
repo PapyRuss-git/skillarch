@@ -36,6 +36,7 @@ install-cli-tools: sanity-check ## Install system packages
 	# nvim config
 	[ ! -d ~/.config/nvim ] && git clone --depth=1 https://github.com/LazyVim/starter ~/.config/nvim
 	$(call symlink,$(SKA_CONFIG)/nvim/init.lua,~/.config/nvim/init.lua)
+	rm -rf ~/.config/nvim/lua ~/.config/nvim/ftplugin
 	ln -sfn $(SKA_CONFIG)/nvim/lua ~/.config/nvim/lua
 	ln -sfn $(SKA_CONFIG)/nvim/ftplugin ~/.config/nvim/ftplugin
 	ln -sfn $(SKA_CONFIG)/nvim/lazy-lock.json ~/.config/nvim/lazy-lock.json

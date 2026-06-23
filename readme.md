@@ -1,11 +1,22 @@
-# SkillArch - [![Security Checks & Docker Builds](https://github.com/laluka/skillarch/actions/workflows/cicd.yml/badge.svg)](https://github.com/laluka/skillarch/actions/workflows/cicd.yml)
+# SkillArch (Fork)
 
 <img src='assets/logo-round-cold.png' width='250'><img src='assets/logo-round-hot.png' width='250'>
 
-> The lite/full install takes 10/15 minutes 🕑️\
-> And here is a gentle rice 😇
+> Fork based on [laluka/skillarch](https://github.com/laluka/skillarch).\
+> Same overall philosophy, with a clearer WM split and a few fork-specific ergonomics.
 
 <img src='assets/rice-01.png' width='800'>
+
+---
+
+## Deltas vs Upstream
+
+- Base: this repository stays close to SkillArch upstream and keeps the same "fork + upstream remote" workflow.
+- Window manager choice: `make install` now prompts for `i3` or `hyprland`.
+- Hyprland modes: `hyprland` can be installed in `desktop` or `vm` mode.
+- Bars: Hyprland uses `waybar` by default, with optional `quickshell` support via `make install-quickshell`.
+- Docker: GUI images are split into `full-i3` and `full-hyprland` instead of relying only on the legacy `full` image.
+- Support boundary: this fork documents its own deltas first; upstream docs remain the reference for the parts that are intentionally unchanged.
 
 ---
 
@@ -19,12 +30,19 @@
 
 - First, download the `Desktop Edition` at https://cachyos.org/download/
 - Install it, pick the `Gnome` flavor
-- Then open `Console` and install SkillArch 🥂
+- Then open `Console` and install this fork 🥂
 
 ```bash
-git clone https://github.com/laluka/skillarch
+git clone https://github.com/devictgit/skillarch
 sudo mv skillarch /opt/skillarch && cd /opt/skillarch
-make install # Then reboot && pick i3 at login
+make install
+
+# The installer will prompt for:
+# - i3 or hyprland
+# - desktop or vm mode when hyprland is selected
+
+# Then reboot and select the session matching your choice at login
+# Optional on Hyprland: make install-quickshell
 
 # Update by running this command (will pull changes & apply them):
 ska-update-simple
@@ -36,7 +54,7 @@ ska-update-simple
 
 [![](https://img.youtube.com/vi/Wq6CmJJnTJk/0.jpg)](https://youtu.be/Wq6CmJJnTJk)
 
-1. [Fork this repo](https://github.com/laluka/skillarch/fork)
+1. Fork this repository
 1. Install `your` SkillArch with the [usual install process](#simple--no-customize--no-backup)
 1. Add the upstream source: `git remote add upstream https://github.com/laluka/skillarch.git`
 1. When you'll want to `add a tweak` or  `update your setup` 🫶
@@ -74,46 +92,52 @@ ska-update-simple
 
 ```bash
 make help
-# Welcome to SkillArch! 🌹
-# Usage: make [target]
-# Targets:
-#   help                Show this help message
-#   install             Install SkillArch
-#   install-base        Install base packages
-#   install-cli-tools   Install system packages
-#   install-shell       Install shell packages
-#   install-docker      Install docker
-#   install-gui         Install gui, i3, polybar, kitty, rofi, picom
-#   install-gui-tools   Install system packages
-#   install-offensive   Install offensive tools
-#   install-wordlists   Install wordlists
-#   install-hardening   Install hardening tools
-#   update              Update SkillArch
-#   docker-build        Build lite docker image locally
-#   docker-build-full   Build full docker image locally
-#   docker-run          Run lite docker image locally
-#   docker-run-full     Run full docker image locally
-#   clean               Clean up system and remove unnecessary files
+# Shows install, Docker, Quickshell, update and smoke-test targets
 ```
+
+### Smoke Tests
+
+```bash
+make test
+```
+
+Runs local smoke tests for WM choice, critical symlinks, bar selection, Dockerfile WM pins and doc coherence.
 
 > Or join the SkillArch Discord server 🍀\
 > ➡️ https://discord.com/invite/tH8wEpNKWS ⬅️\
 > Yes, I help in the SkillArch channel, not in DMs! 😇
 
-### Ska Helpers, i3 bindings, aliases, tools
+### Ska Helpers, WM bindings, aliases, tools
 
 | Alias | Description |
 |-------|-------------|
 | `ska-help-aliases` | Fuzzy-find aliases |
-| `ska-help-bindings` | Fuzzy-find i3 bindings |
+| `ska-help-bindings` | Fuzzy-find WM bindings (i3 or Hyprland) |
 | `ska-help-packages` | Fuzzy-find installed packages |
 | `ska-sudo-unlock` | Unlock current user after 3 sudo fails |
+| `ska-wm-info` | Show current WM/session information |
+| `ska-bar-waybar` | Switch Hyprland bar to Waybar |
+| `ska-bar-quickshell` | Switch Hyprland bar to Quickshell |
+| `ska-bar-toggle` | Toggle Hyprland bar between Waybar and Quickshell |
+| `ska-bar-info` | Show persisted Hyprland bar choice |
 | `ska-update-simple` | Update SkillArch repo & starts install |
 | `ska-update-advanced` | Helper to Pull Upstream & merge |
+
+### Sync With Upstream
+
+```bash
+git remote add upstream https://github.com/laluka/skillarch.git
+git fetch upstream
+git diff upstream/main
+```
+
+Use `ska-update-advanced` if you want the repo to stay close to upstream while keeping your fork-specific changes explicit.
 
 ### MISC Gotchas
 
 - If `make install` or `ska-update-simple` loop on a y/n question, fix your pacman config first! 😉
+- `make install` is no longer i3-only: the installer persists your choice in `~/.config/skillarch/wm-choice`
+- Hyprland uses Waybar by default; install Quickshell separately with `make install-quickshell`
 - The main config is azerty (shhh I know), here is a reference to [tweak your config back to qwerty](https://github.com/CachyOS/cachyos-i3wm-settings/blob/develop/etc/skel/.config/i3/config)
 - Kitty visual/rectangle select is done with `ctrl+alt+click/drag`, you're welcome!
 - The docker `latest` is actually the `lite` image with everything CLI related
@@ -333,7 +357,7 @@ i3lock i3lock-fancy-git i3-battery-popup-git
 
 ```bash
 # Pacman Packages - Hyprland/Wayland
-hyprland hyprlock hypridle hyprpaper waybar grim slurp wl-clipboard dunst
+hyprland hyprlock hypridle hyprpaper waybar grim slurp wl-clipboard swaync
 qt5-wayland qt6-wayland xdg-desktop-portal-hyprland swayidle
 
 # Yay packages - Hyprland/Wayland

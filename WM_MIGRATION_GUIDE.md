@@ -51,7 +51,7 @@ sudo pacman -Rns i3-gaps i3lock i3lock-fancy i3-battery-popup polybar picom \
 cd /opt/skillarch
 
 # Définir le choix WM
-echo "hyprland" > /tmp/ska-wm-choice.txt
+mkdir -p ~/.config/skillarch && echo "hyprland" > ~/.config/skillarch/wm-choice
 
 # Installer Hyprland et ses composants
 make install-gui
@@ -77,7 +77,7 @@ Cette option garde i3 ET Hyprland installés (possibilité de conflits de packag
 cd /opt/skillarch
 
 # Définir le choix WM pour Hyprland
-echo "hyprland" > /tmp/ska-wm-choice.txt
+mkdir -p ~/.config/skillarch && echo "hyprland" > ~/.config/skillarch/wm-choice
 
 # Installer Hyprland sans désinstaller i3
 make install-gui-hyprland
@@ -424,7 +424,7 @@ sudo pacman -Rns hyprland hyprlock hypridle hyprpaper hyprpolkitagent \
     qt5-wayland qt6-wayland xdg-desktop-portal-hyprland
 
 # Réinstaller i3
-echo "i3" > /tmp/ska-wm-choice.txt
+mkdir -p ~/.config/skillarch && echo "i3" > ~/.config/skillarch/wm-choice
 make install-gui
 
 # Redémarrer

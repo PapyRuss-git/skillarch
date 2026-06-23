@@ -4,6 +4,26 @@ Guide de test pour valider la fonctionnalité de choix Window Manager (i3/Hyprla
 
 ---
 
+## Smoke tests locaux
+
+Avant les tests Docker, lancer les smoke tests locaux du repo :
+
+```bash
+cd /opt/skillarch
+make test
+```
+
+Ils couvrent :
+- validation de `WM_CHOICE` et `HYPR_MODE`
+- symlinks critiques selon le WM choisi
+- validation statique de `start-bar.sh`
+- cohérence statique des Dockerfiles `full-i3` / `full-hyprland`
+- absence de références obsolètes à l'ancien chemin WM temporaire
+
+Les tests runtime GUI et Docker restent documentés ci-dessous, mais ils ne font pas partie du smoke test local par défaut.
+
+---
+
 ## Phase 5.4 : Tests Docker Multi-Stage
 
 ### Prérequis
@@ -29,8 +49,8 @@ make docker-build-full-i3
 
 ### Critères de succès
 ✅ L'image de base `thelaluka/skillarch:lite` est téléchargée ou buildée
-✅ Le fichier `/tmp/ska-wm-choice.txt` contient "i3"
-✅ `make install-gui` détecte WM_CHOICE=i3
+✅ Le fichier `~/.config/skillarch/wm-choice` contient "i3"
+✅ `validate-wm-choice` valide `WM_CHOICE=i3`
 ✅ Packages i3-specific installés : i3-gaps, polybar, picom, feh, flameshot, xclip
 ✅ Packages Hyprland NON installés : hyprland, waybar, grim, slurp, wl-clipboard
 ✅ Configuration i3 symlinkée : ~/.config/i3/, ~/.config/polybar/
@@ -60,12 +80,12 @@ Step 2/10 : USER root
 Step 3/10 : RUN echo "hacker ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/hacker
 Step 4/10 : USER hacker
 Step 5/10 : WORKDIR /opt/skillarch
-Step 6/10 : RUN echo "i3" > /tmp/ska-wm-choice.txt
+Step 6/10 : RUN mkdir -p ~/.config/skillarch && echo "i3" > ~/.config/skillarch/wm-choice
 Step 7/10 : RUN make install-docker
 Step 8/10 : RUN make install-gui
  ---> Running in xxxxx
-[install-gui] WM_CHOICE detected: i3
-Installing GUI common packages...
+✅ WM_CHOICE validated: i3
+Installing GUI based on your choice: i3
 Installing i3-specific packages...
 ✓ i3-gaps installed
 ✓ polybar installed
@@ -89,8 +109,8 @@ make docker-build-full-hyprland
 
 ### Critères de succès
 ✅ L'image de base `thelaluka/skillarch:lite` réutilisée (cache)
-✅ Le fichier `/tmp/ska-wm-choice.txt` contient "hyprland"
-✅ `make install-gui` détecte WM_CHOICE=hyprland
+✅ Le fichier `~/.config/skillarch/wm-choice` contient "hyprland"
+✅ `validate-wm-choice` valide `WM_CHOICE=hyprland`
 ✅ Packages Hyprland installés : hyprland, waybar, grim, slurp, wl-clipboard, clipse
 ✅ Packages i3 NON installés : i3-gaps, polybar, picom, feh, flameshot
 ✅ Configuration Hyprland symlinkée : ~/.config/hypr/, ~/.config/waybar/
@@ -120,12 +140,12 @@ Step 2/10 : USER root
 Step 3/10 : RUN echo "hacker ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/hacker
 Step 4/10 : USER hacker
 Step 5/10 : WORKDIR /opt/skillarch
-Step 6/10 : RUN echo "hyprland" > /tmp/ska-wm-choice.txt
+Step 6/10 : RUN mkdir -p ~/.config/skillarch && echo "hyprland" > ~/.config/skillarch/wm-choice
 Step 7/10 : RUN make install-docker
 Step 8/10 : RUN make install-gui
  ---> Running in xxxxx
-[install-gui] WM_CHOICE detected: hyprland
-Installing GUI common packages...
+✅ WM_CHOICE validated: hyprland
+Installing GUI based on your choice: hyprland
 Installing Hyprland-specific packages...
 ✓ hyprland installed
 ✓ waybar installed
@@ -494,7 +514,7 @@ Pour marquer un test comme réussi, documenter :
 **Output** :
 ```
 Step 8/10 : RUN make install-gui
-[install-gui] WM_CHOICE detected: i3
+✅ WM_CHOICE validated: i3
 Installing i3-specific packages...
 ✓ i3-gaps installed
 ...
