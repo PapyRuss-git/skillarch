@@ -1,0 +1,59 @@
+[env]
+TERM = "xterm-256color"
+
+[window]
+opacity = 1.0
+
+[font]
+size = 16
+
+[font.normal]
+family = "MesloLGS Nerd Font"
+style = "Regular"
+
+[font.bold]
+family = "MesloLGS Nerd Font"
+style = "Bold"
+
+[font.italic]
+family = "MesloLGS Nerd Font"
+style = "Italic"
+
+[font.bold_italic]
+family = "MesloLGS Nerd Font"
+style = "Bold Italic"
+
+[cursor]
+style = { shape = "Block", blinking = "Off" }
+
+[colors.primary]
+background = "#272E33"
+foreground = "#D3C6AA"
+
+[colors.cursor]
+text = "#272E33"
+cursor = "#A7C080"
+
+[colors.selection]
+text = "#272E33"
+background = "#A7C080"
+
+[colors.normal]
+black = "#323C41"
+red = "#E67E80"
+green = "#A7C080"
+yellow = "#DBBC7F"
+blue = "#7FBBB3"
+magenta = "#D699B6"
+cyan = "#83C092"
+white = "#D3C6AA"
+
+[colors.bright]
+black = "#5C6A72"
+red = "#E67E80"
+green = "#A7C080"
+yellow = "#DBBC7F"
+blue = "#7FBBB3"
+magenta = "#D699B6"
+cyan = "#83C092"
+white = "#D3C6AA"
