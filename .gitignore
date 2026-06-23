@@ -1,2 +1,21 @@
+# ── SkillArch ─────────────────────────────────────────────
+
+# Installer backups (created before symlinking, see helpers.mk)
 *.skabak
+*.bak
+*.orig
+
+# Logs
+*.log
+.nvimlog
+
+# Stray tool/agent state dropped in the repo
+.codex
+
+# Editor noise
 .vscode
+
+# Neovim runtime state — must live in ~/.local, never in the repo tree
+config/nvim/.local/
+config/nvim/.treesitter/
+config/nvim/.deps/
