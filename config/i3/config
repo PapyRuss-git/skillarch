@@ -22,22 +22,25 @@ font pango:monospace 8
 
 # Start XDG autostart .desktop files using dex. See also
 # https://wiki.archlinux.org/index.php/XDG_Autostart
-exec_always --no-startup-id dex --autostart --environment i3
+exec --no-startup-id dex --autostart --environment i3
+
+# Wallpaper + bar are re-applied on every reload, so they use exec_always.
 exec_always --no-startup-id feh --bg-scale /opt/skillarch/assets/everforest-bg.jpg
 exec_always --no-startup-id ~/.config/polybar/launch.sh &> /var/tmp/polybar.log
-exec_always --no-startup-id pgrep --exact VBoxService &> /dev/null && killall VBoxClient ; VBoxClient-all
-exec_always --no-startup-id bash -c "killall -q picom ; grep -qF hypervisor /proc/cpuinfo || picom"
-exec_always --no-startup-id i3-battery-popup
-exec_always --no-startup-id /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1
-# The combination of xss-lock, nm-applet and pactl is a popular choice, so
-# they are included here as an example. Modify as you see fit.
-# xss-lock grabs a logind suspend inhibit lock and will use i3lock to lock the
-# screen before suspend. Use loginctl lock-session to lock your screen.
-exec_always --no-startup-id xss-lock --transfer-sleep-lock -- i3lock --nofork
 
-# NetworkManager is the most popular way to manage wireless networks on Linux,
-# and nm-applet is a desktop environment-independent system tray GUI for it.
-exec_always --no-startup-id nm-applet
+# Compositor: skip picom inside a hypervisor (most VMs have no GPU acceleration).
+exec_always --no-startup-id bash -c "killall -q picom ; systemd-detect-virt --quiet || picom"
+
+# VM guest integration (clipboard + dynamic resolution); no-op on bare metal.
+exec --no-startup-id ~/.config/i3/vm-guest-integration.sh
+
+# One-shot daemons use exec (not exec_always) to avoid duplicates on reload.
+exec --no-startup-id i3-battery-popup
+exec --no-startup-id /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1
+# xss-lock grabs a logind suspend-inhibit lock and runs i3lock before suspend.
+exec --no-startup-id xss-lock --transfer-sleep-lock -- i3lock --nofork
+# nm-applet: tray GUI for NetworkManager.
+exec --no-startup-id nm-applet
 
 # Use pactl to adjust volume in PulseAudio.
 # set $refresh_i3status killall -SIGUSR1 i3status
@@ -59,7 +62,7 @@ tiling_drag modifier titlebar
 
 # start a terminal
 bindsym $mod+Return exec /usr/bin/kitty
-bindsym $mod+Shift+Return exec /usr/bin/google-chrome-stable
+bindsym $mod+Shift+Return exec zen-browser
 
 # kill focused window
 bindsym $mod+Shift+Q kill
@@ -200,7 +203,6 @@ default_floating_border pixel 2
 client.focused          #A7C080 #272E33 #D3C6AA #83C092   #A7C080
 client.unfocused        #1E2326 #1E2326 #5C6A72 #1E2326   #1E2326
 client.focused_inactive #272E33 #272E33 #859289 #272E33   #272E33
-client.unfocused_inactive #1E2326 #1E2326 #5C6A72 #1E2326   #1E2326
 client.urgent           #E67E80 #E67E80 #D3C6AA #E67E80   #E67E80
 
 # Make help windows float by default

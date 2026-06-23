@@ -6,7 +6,7 @@ install-gui-i3: sanity-check ## Install i3 window manager (X11)
 
 	# i3 window manager packages
 	yes|sudo pacman -S --noconfirm --needed \
-		i3-gaps i3blocks i3lock i3lock-fancy-git i3status \
+		i3-gaps i3lock i3lock-fancy-git \
 		polybar picom dmenu
 
 	# X11 utilities
@@ -18,12 +18,20 @@ install-gui-i3: sanity-check ## Install i3 window manager (X11)
 	# X11 portal & polkit
 	yes|sudo pacman -S --noconfirm --needed xdg-desktop-portal-gtk polkit-gnome
 
+	# VM guest integration (clipboard + dynamic resolution in QEMU/KVM/GNOME Boxes & VMware)
+	# VirtualBox guest utils stay opt-in via the ska-vbox-install-guestutils alias.
+	yes|sudo pacman -S --noconfirm --needed spice-vdagent open-vm-tools
+
 	# AUR packages
 	yay --noconfirm --needed -S rofi-power-menu i3-battery-popup-git
 
 	# i3 config
 	[ ! -d ~/.config/i3 ] && mkdir -p ~/.config/i3
 	$(call symlink,$(SKA_CONFIG)/i3/config,~/.config/i3/config)
+
+	# VM guest integration helper (started from ~/.config/i3/config)
+	$(call symlink,$(SKA_CONFIG)/i3/vm-guest-integration.sh,~/.config/i3/vm-guest-integration.sh)
+	chmod +x $(SKA_CONFIG)/i3/vm-guest-integration.sh
 
 	# polybar config
 	[ ! -d ~/.config/polybar ] && mkdir -p ~/.config/polybar
@@ -41,4 +49,5 @@ install-gui-i3: sanity-check ## Install i3 window manager (X11)
 	@echo "✅ i3-gaps (X11) installed!"
 	@echo "   WM: i3-gaps | Bar: Polybar | Compositor: Picom"
 	@echo "   Screenshots: Flameshot | Lock: i3lock-fancy"
+	@echo "   VM-ready: picom auto-disabled in hypervisors + guest integration (VBox/SPICE/VMware)"
 	make clean

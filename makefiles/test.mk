@@ -74,6 +74,7 @@ test-symlinks: ## Validate config symlinks point to SKA_DIR
 	elif [ "$(WM_CHOICE)" = "i3" ]; then \
 		for link in \
 			~/.config/i3/config \
+			~/.config/i3/vm-guest-integration.sh \
 			~/.config/polybar/config.ini \
 			~/.config/polybar/launch.sh \
 			~/.config/picom.conf \
