@@ -2,6 +2,12 @@
 
 Ce guide vous aidera à migrer votre installation SkillArch d'i3 (X11) vers Hyprland (Wayland).
 
+> **⚠️ Note (août 2026)** : depuis Hyprland 0.55, la configuration est au format **Lua**
+> (`~/.config/hypr/hyprland.lua`, overrides de mode dans `~/.config/hypr/hyprland-mode.lua`,
+> moniteurs locaux dans `~/.config/hypr/monitors.lua`). Les extraits de ce guide qui
+> référencent `hyprland.conf` / `hyprland-vm.conf` décrivent l'ancien format hyprlang,
+> déprécié — la sélection desktop/VM se fait désormais via `make install` (`HYPR_MODE`).
+
 ---
 
 ## Avant de Commencer

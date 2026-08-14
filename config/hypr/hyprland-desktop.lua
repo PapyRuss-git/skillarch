@@ -1,0 +1,2 @@
+-- Hyprland Desktop Mode
+-- No overrides needed — hyprland.lua contains desktop defaults

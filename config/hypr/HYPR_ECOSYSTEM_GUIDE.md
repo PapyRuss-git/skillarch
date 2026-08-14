@@ -4,12 +4,17 @@
 
 Configuration complète de l'écosystème Hyprland avec le thème Everforest pour SkillArch.
 
+> **⚠️ Note (août 2026)** : depuis Hyprland 0.55, la config du compositeur est au format
+> **Lua** (`config/hypr/hyprland.lua`). Les mentions de `hyprland.conf` dans ce guide
+> renvoient à l'ancien format hyprlang, déprécié. Les outils hypr* (hypridle, hyprlock,
+> hyprpaper, hyprsunset) restent en `.conf`.
+
 ## 📦 Composants installés
 
 ### 1. **hyprland** - Compositeur Wayland
 Gestionnaire de fenêtres principal avec configuration multi-moniteurs.
 
-**Fichier** : `config/hypr/hyprland.conf`
+**Fichier** : `config/hypr/hyprland.lua`
 
 **Fonctionnalités clés** :
 - Layout AZERTY français

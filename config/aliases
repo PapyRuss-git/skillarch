@@ -23,13 +23,13 @@ alias ska-help-bindings='(
         echo "🔍 Session: ${XDG_CURRENT_DESKTOP:-Inconnu} (${XDG_SESSION_TYPE:-Inconnu})"
         echo "ℹ️  Gestionnaire de fenêtres non détecté ou non accessible"
         echo "📋 Raccourcis depuis les fichiers de config:"
-        if [[ -f /opt/skillarch/config/hypr/hyprland.conf ]]; then
-            echo "  Hyprland: $(grep -c "^bind" /opt/skillarch/config/hypr/hyprland.conf) bindings"
+        if [[ -f /opt/skillarch/config/hypr/hyprland.lua ]]; then
+            echo "  Hyprland: $(grep -cF "hl.bind(" /opt/skillarch/config/hypr/hyprland.lua) bindings"
             if [[ -t 1 ]] && command -v fzf &>/dev/null; then
                 echo "Tapez [h] pour Hyprland, [i] pour i3, ou [Entrée] pour quitter:"
                 read -r choice
                 case $choice in
-                    h) grep "^bind" /opt/skillarch/config/hypr/hyprland.conf | fzf --header="🎹 Hyprland Key Bindings (config file)" ;;
+                    h) grep -F "hl.bind(" /opt/skillarch/config/hypr/hyprland.lua | fzf --header="🎹 Hyprland Key Bindings (config file)" ;;
                     i) grep "^bindsym" /opt/skillarch/config/i3/config | fzf --header="🎹 i3 Key Bindings (config file)" ;;
                     *) echo "Annulé." ;;
                 esac

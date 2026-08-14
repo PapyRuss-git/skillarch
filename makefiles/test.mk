@@ -47,9 +47,9 @@ test-symlinks: ## Validate config symlinks point to SKA_DIR
 	done; \
 	if [ "$(WM_CHOICE)" = "hyprland" ]; then \
 		for link in \
-			~/.config/hypr/hyprland.conf \
+			~/.config/hypr/hyprland.lua \
 			~/.config/hypr/application-style.conf \
-			~/.config/hypr/hyprland-mode.conf \
+			~/.config/hypr/hyprland-mode.lua \
 			~/.config/hypr/hyprpaper.conf \
 			~/.config/hypr/hyprlock.conf \
 			~/.config/hypr/hypridle.conf \

@@ -71,8 +71,9 @@ if pgrep -x "Hyprland" &>/dev/null; then
             fi
         fi
 
-        # Config file location
-        HYPR_CONFIG="$HOME/.config/hypr/hyprland.conf"
+        # Config file location (Lua since Hyprland 0.55; fall back to legacy .conf)
+        HYPR_CONFIG="$HOME/.config/hypr/hyprland.lua"
+        [[ -e "$HYPR_CONFIG" ]] || HYPR_CONFIG="$HOME/.config/hypr/hyprland.conf"
         if [[ -L "$HYPR_CONFIG" ]]; then
             CONFIG_TARGET=$(readlink -f "$HYPR_CONFIG")
             echo -e "${INFO_ICON}  ${CYAN}Config:${NC} $(basename $CONFIG_TARGET)"

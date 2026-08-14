@@ -91,8 +91,9 @@ Centralized configuration with atomic symlink operations from `/opt/skillarch/co
 - `config/xorg.conf.d/30-touchpad.conf` → `/etc/X11/xorg.conf.d/30-touchpad.conf`
 
 **Hyprland-specific Configs** (Wayland):
-- `config/hypr/hyprland.conf` → `~/.config/hypr/hyprland.conf` (Desktop mode)
-- `config/hypr/hyprland-vm.conf` → `~/.config/hypr/hyprland.conf` (VM mode)
+- `config/hypr/hyprland.lua` → `~/.config/hypr/hyprland.lua` (Lua config, Hyprland 0.55+; hyprlang `.conf` is deprecated)
+- `config/hypr/hyprland-desktop.lua` or `config/hypr/hyprland-vm.lua` → `~/.config/hypr/hyprland-mode.lua` (mode overrides, per `HYPR_MODE`)
+- `~/.config/hypr/monitors.lua` (local, untracked) — optional multi-monitor overrides sourced by `hyprland.lua`
 - `config/hypr/hyprlock.conf` → `~/.config/hypr/hyprlock.conf`
 - `config/hypr/hypridle.conf` → `~/.config/hypr/hypridle.conf`
 - `config/hypr/hyprpaper.conf` → `~/.config/hypr/hyprpaper.conf`
@@ -222,7 +223,7 @@ SkillArch supports two distinct window manager setups selected at install time v
 ### Configuration Files
 - Main aliases: `config/aliases`
 - **i3 configuration**: `config/i3/config`, `config/polybar/`, `config/picom.conf`, `config/xorg.conf.d/`
-- **Hyprland configuration**: `config/hypr/` (contains hyprland.conf, hyprland-vm.conf, hyprlock.conf, hypridle.conf, hyprpaper.conf, waybar/, swaync/, clipse/, xdg-desktop-portal/)
+- **Hyprland configuration**: `config/hypr/` (contains hyprland.lua, hyprland-desktop.lua, hyprland-vm.lua — Lua format, Hyprland 0.55+ — plus hyprlock.conf, hypridle.conf, hyprpaper.conf, waybar/, swaync/, clipse/, xdg-desktop-portal/; hypr* tools keep hyprlang .conf)
 - **Common configs**: `config/kitty/`, `config/rofi/`, `config/nvim/`, `config/zshrc`, `config/vimrc`, `config/tmux.conf`
 - VSCode extensions: `config/extensions.txt`
 - Chrome extensions list: `config/chrome-extensions.lst`

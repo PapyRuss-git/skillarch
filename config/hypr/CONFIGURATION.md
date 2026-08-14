@@ -4,10 +4,20 @@
 
 Cette documentation détaille **chaque aspect** de la configuration Hyprland pour SkillArch, incluant toutes les sections, options et justifications.
 
-**Version Hyprland** : Compatible avec Hyprland 0.42+
+**Version Hyprland** : Compatible avec Hyprland 0.55+ (config Lua)
 **Thème** : Everforest Hard Dark
 **Layout clavier** : AZERTY (FR)
 **Multi-moniteurs** : 3 écrans configurés
+
+> **⚠️ Migration Lua (Hyprland 0.55+)** : depuis Hyprland 0.55 (mai 2026), le format
+> hyprlang `.conf` est déprécié et sera supprimé de Hyprland. La configuration
+> principale est désormais `hyprland.lua` (API `hl.*`). Les overrides de mode sont
+> dans `hyprland-desktop.lua` / `hyprland-vm.lua` (symlinkés en
+> `~/.config/hypr/hyprland-mode.lua` par l'installeur), et les overrides moniteurs
+> locaux dans `~/.config/hypr/monitors.lua`. Les extraits `conf` ci-dessous
+> documentent l'ancienne syntaxe à titre de référence ; la logique et les valeurs
+> sont identiques dans `hyprland.lua`. Les outils hypr* (hypridle, hyprlock,
+> hyprpaper, hyprsunset) restent en hyprlang `.conf`.
 
 ---
 
@@ -15,7 +25,9 @@ Cette documentation détaille **chaque aspect** de la configuration Hyprland pou
 
 ```
 /opt/skillarch/config/hypr/
-├── hyprland.conf           # Configuration principale
+├── hyprland.lua            # Configuration principale (Lua, Hyprland 0.55+)
+├── hyprland-desktop.lua    # Overrides mode desktop (vide, defaults desktop)
+├── hyprland-vm.lua         # Overrides mode VM (pas d'animations/blur/ombres)
 ├── hypridle.conf           # Gestion de l'inactivité
 ├── hyprlock.conf           # Écran de verrouillage
 ├── hyprpaper.conf          # Fond d'écran
@@ -26,7 +38,7 @@ Cette documentation détaille **chaque aspect** de la configuration Hyprland pou
 
 ---
 
-## 🔧 hyprland.conf - Configuration principale
+## 🔧 hyprland.lua - Configuration principale
 
 ### Section 1 : Variables d'environnement
 

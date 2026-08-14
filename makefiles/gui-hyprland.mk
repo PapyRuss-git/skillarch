@@ -28,19 +28,27 @@ install-gui-hyprland: sanity-check ## Install Hyprland compositor (Wayland)
 	# Create Hyprland config directories
 	mkdir -p ~/.config/hypr ~/.config/waybar ~/.config/swaync ~/.config/clipse ~/.config/xdg-desktop-portal ~/.config/qt6ct/colors
 
-	# Hyprland config (single source, mode-specific overrides via source)
-	$(call symlink,$(SKA_CONFIG)/hypr/hyprland.conf,~/.config/hypr/hyprland.conf)
+	# Hyprland config (single source, mode-specific overrides via hyprland-mode.lua)
+	# Hyprland >= 0.55 uses the Lua config format; the hyprlang .conf format is deprecated
+	$(call symlink,$(SKA_CONFIG)/hypr/hyprland.lua,~/.config/hypr/hyprland.lua)
 	$(call symlink,$(SKA_CONFIG)/hypr/application-style.conf,~/.config/hypr/application-style.conf)
 	@if [ "$(HYPR_MODE)" = "vm" ]; then \
 		echo "   Mode: VM (optimized, no animations/blur)"; \
-		ln -sf $(SKA_CONFIG)/hypr/hyprland-vm.conf ~/.config/hypr/hyprland-mode.conf; \
+		ln -sf $(SKA_CONFIG)/hypr/hyprland-vm.lua ~/.config/hypr/hyprland-mode.lua; \
 	else \
 		echo "   Mode: Desktop (animations, blur, eye candy)"; \
-		ln -sf $(SKA_CONFIG)/hypr/hyprland-desktop.conf ~/.config/hypr/hyprland-mode.conf; \
+		ln -sf $(SKA_CONFIG)/hypr/hyprland-desktop.lua ~/.config/hypr/hyprland-mode.lua; \
 	fi
 
-	# Create empty monitors.conf if it doesn't exist (sourced by hyprland.conf for custom multi-monitor setups)
-	touch ~/.config/hypr/monitors.conf
+	# Remove legacy hyprlang symlinks left by pre-Lua installs
+	[ -L ~/.config/hypr/hyprland.conf ] && rm -f ~/.config/hypr/hyprland.conf || true
+	[ -L ~/.config/hypr/hyprland-mode.conf ] && rm -f ~/.config/hypr/hyprland-mode.conf || true
+
+	# Create empty monitors.lua if it doesn't exist (sourced by hyprland.lua for custom multi-monitor setups)
+	touch ~/.config/hypr/monitors.lua
+	@if [ -s ~/.config/hypr/monitors.conf ]; then \
+		echo "   ⚠️  ~/.config/hypr/monitors.conf is no longer read — port it to ~/.config/hypr/monitors.lua (hl.monitor / hl.workspace_rule)"; \
+	fi
 
 	# hyprpaper config
 	$(call symlink,$(SKA_CONFIG)/hypr/hyprpaper.conf,~/.config/hypr/hyprpaper.conf)
